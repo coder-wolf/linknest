@@ -16,7 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ProfileCanvas, type CanvasWidget } from "@/components/profile-canvas";
-import { PhoneFrame } from "@/components/marketing/phone-frame";
+import { PhoneFrame } from "@/components/phone-frame";
 import { THEME_PRESETS } from "@/lib/themes";
 import { DEFAULT_WIDGET_CONFIGS, type WidgetConfig, type WidgetType } from "@/lib/widgets";
 import { cn } from "@/lib/utils";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Check, Link2, Music2, TrendingUp, Type } from "lucide-react";
-import { PhoneFrame } from "@/components/marketing/phone-frame";
+import { PhoneFrame } from "@/components/phone-frame";
 import { ProfilePreview } from "@/components/profile-preview";
 import { THEME_PRESETS, type ThemePresetKey } from "@/lib/themes";
 import { cn } from "@/lib/utils";

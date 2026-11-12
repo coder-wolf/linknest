@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Check } from "lucide-react";
 import { ProfileCanvas, type CanvasWidget } from "@/components/profile-canvas";
+import { PhoneFrame } from "@/components/phone-frame";
 import { SubmitButton } from "@/components/submit-button";
 import { Alert, Card, CardBody, CardHeader } from "@/components/ui/card";
 import { FieldHint, Input, Label, Select } from "@/components/ui/field";
@@ -354,8 +355,8 @@ export function AppearanceForm({
         <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.16em] text-muted">
           Live preview
         </p>
-        <div className="overflow-hidden rounded-[30px] border-[9px] border-ink bg-ink shadow-2xl">
-          <div className="no-scrollbar max-h-[calc(100vh-11rem)] overflow-y-auto">
+        <PhoneFrame width="w-full max-w-[340px]" statusColor={theme.textColor}>
+          <div className="no-scrollbar h-full overflow-y-auto">
             <ProfileCanvas
               profile={{
                 displayName: profile.displayName,
@@ -369,10 +370,12 @@ export function AppearanceForm({
               theme={theme}
               showBranding={plan === "FREE"}
               interactive={false}
-              className="min-h-[560px]"
+              compact
+              safeArea
+              className="min-h-full"
             />
           </div>
-        </div>
+        </PhoneFrame>
         <p className="mt-3 text-center text-xs text-muted">
           Preview only — links are not clickable here.
         </p>
