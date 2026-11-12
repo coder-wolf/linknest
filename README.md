@@ -2,6 +2,10 @@
 
 A link-in-bio SaaS: one customizable public page for every link you share.
 
+**Live demo:** https://link-in-bio-six-self.vercel.app — log in with `demo@linknest.com` /
+`password123` and view the seeded profile at
+[/mima](https://link-in-bio-six-self.vercel.app/mima).
+
 Built from the product requirements in [`PRD.md`](./PRD.md). This repository currently covers
 Phases 1–4 of the MVP roadmap: authentication and onboarding, link and social management,
 public profiles with themes, and first-party analytics.
@@ -149,3 +153,24 @@ src/
 - Run `prisma migrate deploy` on release, then `pnpm build`.
 - Public profiles can be cached at the CDN later; analytics writes are already decoupled through
   the tracking endpoint.
+
+### Vercel
+
+The project is deployed at https://link-in-bio-six-self.vercel.app with a Neon Postgres database
+provisioned through the Vercel Marketplace. Pushes to `main` deploy automatically.
+
+```bash
+vercel link
+vercel integration add neon --name linknest-db
+
+# Apply the schema and seed the hosted database once
+set -a && . ./.env.local && set +a
+DATABASE_URL="$DATABASE_URL_UNPOOLED" pnpm exec prisma db push
+DATABASE_URL="$DATABASE_URL_UNPOOLED" pnpm db:seed
+
+vercel --prod
+```
+
+Required production env vars: `DATABASE_URL` (from Neon), `AUTH_SECRET`, and
+`NEXT_PUBLIC_APP_URL`. `postinstall` runs `prisma generate` during the Vercel build. For schema
+changes, create a Prisma migration and run `prisma migrate deploy` against the unpooled URL.
