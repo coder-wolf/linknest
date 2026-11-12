@@ -61,6 +61,8 @@ type ProfileCanvasProps = {
   showBranding?: boolean;
   interactive?: boolean;
   compact?: boolean;
+  fullBleed?: boolean;
+  safeArea?: boolean;
   className?: string;
 };
 
@@ -73,9 +75,12 @@ export function ProfileCanvas({
   showBranding = true,
   interactive = true,
   compact = false,
+  fullBleed = false,
+  safeArea = false,
   className,
 }: ProfileCanvasProps) {
   const visible = widgets.filter((widget) => widget.isVisible !== false);
+  const card = theme.layout === "card" && !fullBleed;
 
   return (
     <div
@@ -101,20 +106,23 @@ export function ProfileCanvas({
       <div
         className={cn(
           "relative z-10 flex min-h-full flex-col items-center justify-center",
-          compact ? "px-4 py-6" : "px-5 py-12 sm:px-6 sm:py-16",
+          compact ? "px-3 py-6" : "px-5 py-12 sm:px-6 sm:py-16",
+          safeArea && (compact ? "pt-10 pb-6" : "pt-14 pb-10"),
         )}
       >
         <div
           className={cn(
             "w-full",
-            theme.layout === "card"
+            card
               ? cn(
                   "max-w-[440px]",
-                  compact ? "rounded-[22px] px-4 py-5" : "rounded-[30px] px-6 py-8 sm:px-7",
+                  compact ? "rounded-[22px] px-3 py-5" : "rounded-[30px] px-6 py-8 sm:px-7",
                 )
-              : "max-w-[440px]",
+              : fullBleed
+                ? "max-w-none"
+                : "max-w-[440px]",
           )}
-          style={theme.layout === "card" ? cardStyle(theme) : undefined}
+          style={card ? cardStyle(theme) : undefined}
         >
           <div className={cn("flex flex-col", compact ? "gap-4" : "gap-6")}>
             {visible.map((widget) => (

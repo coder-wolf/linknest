@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ProfileCanvas, type CanvasWidget } from "@/components/profile-canvas";
+import { PhoneFrame } from "@/components/marketing/phone-frame";
 import { THEME_PRESETS } from "@/lib/themes";
 import { DEFAULT_WIDGET_CONFIGS, type WidgetConfig, type WidgetType } from "@/lib/widgets";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,7 @@ type DemoItem = {
 const INITIAL: DemoItem[] = [
   { key: "header", label: "Profile header", icon: UserRound, visible: true },
   { key: "socials", label: "Social icons", icon: Share2, visible: true },
-  { key: "text", label: "Text block", icon: Type, visible: true },
+  { key: "text", label: "Text block", icon: Type, visible: false },
   { key: "links", label: "Links", icon: Link2, visible: true },
   { key: "button", label: "Call to action", icon: MousePointerClick, visible: true },
   { key: "divider", label: "Divider", icon: Minus, visible: false },
@@ -38,6 +39,7 @@ const INITIAL: DemoItem[] = [
 
 const CONFIGS: Record<WidgetType, WidgetConfig> = {
   ...DEFAULT_WIDGET_CONFIGS,
+  links: { layout: "stack", showDescriptions: false, showIcons: true },
   text: {
     heading: "In the studio",
     body: "Lisbon · open for two commissions this month.",
@@ -55,6 +57,7 @@ const sampleSocials = [
   { platform: "instagram" },
   { platform: "x" },
   { platform: "youtube" },
+  { platform: "spotify" },
 ];
 
 export function BuilderDemo() {
@@ -97,7 +100,7 @@ export function BuilderDemo() {
 
   return (
     <div className="relative rounded-[30px] border border-white/12 bg-white/[0.06] p-3 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.8)] backdrop-blur-sm sm:p-4">
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_210px] sm:items-center">
+      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_262px] sm:items-center">
         <div className="rounded-2xl border border-black/5 bg-[#fbfaf6] p-3.5 text-foreground shadow-xl sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
@@ -183,30 +186,30 @@ export function BuilderDemo() {
           </div>
         </div>
 
-        <div className="mx-auto w-[204px]">
-          <div className="relative rounded-[34px] border-[7px] border-ink bg-ink shadow-[0_30px_60px_-24px_rgba(0,0,0,0.8)]">
-            <div
-              aria-hidden
-              className="absolute left-1/2 top-[7px] z-20 h-3.5 w-16 -translate-x-1/2 rounded-full bg-ink"
+        <div className="mx-auto w-[250px]">
+          <PhoneFrame
+            width="w-[250px]"
+            compact
+            statusColor={THEME_PRESETS.gradient.theme.textColor}
+          >
+            <ProfileCanvas
+              profile={{
+                displayName: "Mima Sánchez",
+                username: "mima",
+                bio: "Illustrator in Lisbon.",
+              }}
+              links={sampleLinks}
+              socials={sampleSocials}
+              widgets={widgets}
+              theme={THEME_PRESETS.gradient.theme}
+              showBranding={false}
+              interactive={false}
+              compact
+              fullBleed
+              safeArea
+              className="h-full min-h-full"
             />
-            <div className="relative h-[640px] overflow-hidden rounded-[27px] bg-white">
-              <ProfileCanvas
-                profile={{
-                  displayName: "Mima Sánchez",
-                  username: "mima",
-                  bio: "Illustrator in Lisbon.",
-                }}
-                links={sampleLinks}
-                socials={sampleSocials}
-                widgets={widgets}
-                theme={THEME_PRESETS.gradient.theme}
-                showBranding={false}
-                interactive={false}
-                compact
-                className="h-full min-h-full"
-              />
-            </div>
-          </div>
+          </PhoneFrame>
           <p className="mt-2.5 text-center text-[10px] text-white/50">
             Live preview · updates instantly
           </p>

@@ -30,6 +30,8 @@ export function ProfilePreview({
   theme,
   showBranding = true,
   compact = false,
+  fullBleed = false,
+  safeArea = false,
   className,
 }: {
   displayName: string;
@@ -41,6 +43,8 @@ export function ProfilePreview({
   theme: Theme;
   showBranding?: boolean;
   compact?: boolean;
+  fullBleed?: boolean;
+  safeArea?: boolean;
   className?: string;
 }) {
   const widgets: CanvasWidget[] = [
@@ -75,6 +79,8 @@ export function ProfilePreview({
       showBranding={showBranding}
       interactive={false}
       compact={compact}
+      fullBleed={fullBleed}
+      safeArea={safeArea}
       className={cn("rounded-[28px] border border-black/10 shadow-xl", className)}
     />
   );

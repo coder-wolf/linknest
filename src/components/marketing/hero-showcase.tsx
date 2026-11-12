@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Link2, Music2, TrendingUp, Type } from "lucide-react";
+import { PhoneFrame } from "@/components/marketing/phone-frame";
 import { ProfilePreview } from "@/components/profile-preview";
 import { THEME_PRESETS, type ThemePresetKey } from "@/lib/themes";
 import { cn } from "@/lib/utils";
@@ -44,26 +45,22 @@ export function HeroShowcase() {
         className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ink/15"
       />
 
-      <div className="relative mx-auto w-[292px] sm:w-[316px]">
-        <div className="relative rounded-[50px] border-[10px] border-ink bg-ink shadow-[0_55px_110px_-35px_rgba(23,22,15,0.6)]">
-          <div
-            aria-hidden
-            className="absolute left-1/2 top-[10px] z-20 h-[21px] w-[104px] -translate-x-1/2 rounded-full bg-ink"
+      <div className="relative mx-auto w-[286px] sm:w-[302px]">
+        <PhoneFrame statusColor={theme.textColor} width="w-full">
+          <ProfilePreview
+            displayName="Mima Sánchez"
+            username="mima"
+            bio="Illustrator & printmaker. Small things, made slowly."
+            links={sampleLinks}
+            socials={sampleSocials}
+            theme={theme}
+            showBranding={false}
+            compact
+            fullBleed
+            safeArea
+            className="h-full min-h-full rounded-none border-0 shadow-none"
           />
-          <div className="relative h-[556px] overflow-hidden rounded-[40px] bg-white">
-            <ProfilePreview
-              displayName="Mima Sánchez"
-              username="mima"
-              bio="Illustrator & printmaker. Small things, made slowly."
-              links={sampleLinks}
-              socials={sampleSocials}
-              theme={theme}
-              showBranding={false}
-              compact
-              className="h-full min-h-full rounded-none border-0 shadow-none"
-            />
-          </div>
-        </div>
+        </PhoneFrame>
       </div>
 
       <div className="animate-float absolute -left-24 top-20 z-20 hidden w-[158px] rounded-2xl border border-black/5 bg-white/90 p-3.5 shadow-[0_20px_45px_-20px_rgba(23,22,15,0.45)] backdrop-blur sm:block">
