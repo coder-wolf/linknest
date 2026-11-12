@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display, Space_Grotesk } from "next/font/google";
+import { appUrl } from "@/lib/utils";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,7 +24,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(appUrl()),
   title: {
     default: "LinkNest — A home for your entire online presence",
     template: "%s · LinkNest",
