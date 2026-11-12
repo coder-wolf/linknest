@@ -91,3 +91,87 @@ input[type="color"]::-webkit-color-swatch {
   border: 1px solid var(--border);
   border-radius: 8px;
 }
+
+/* Landing page motion — subtle, and disabled for reduced-motion users. */
+@keyframes ln-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes ln-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ln-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ln-pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
+}
+
+.animate-float {
+  animation: ln-float 7s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: ln-float 8s ease-in-out -3.5s infinite;
+}
+
+.animate-marquee {
+  animation: ln-marquee 38s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: ln-marquee 60s linear infinite;
+}
+
+.animate-spin-slow {
+  animation: ln-spin 48s linear infinite;
+}
+
+.animate-pulse-dot {
+  animation: ln-pulse-dot 2.4s ease-in-out infinite;
+}
+
+.mask-fade-x {
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.mask-fade-b {
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-delayed,
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-spin-slow,
+  .animate-pulse-dot {
+    animation: none !important;
+  }
+}

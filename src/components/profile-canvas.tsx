@@ -60,6 +60,7 @@ type ProfileCanvasProps = {
   theme: Theme;
   showBranding?: boolean;
   interactive?: boolean;
+  compact?: boolean;
   className?: string;
 };
 
@@ -71,6 +72,7 @@ export function ProfileCanvas({
   theme,
   showBranding = true,
   interactive = true,
+  compact = false,
   className,
 }: ProfileCanvasProps) {
   const visible = widgets.filter((widget) => widget.isVisible !== false);
@@ -96,17 +98,25 @@ export function ProfileCanvas({
         <div aria-hidden className="pointer-events-none absolute inset-0" style={textureStyle(theme)} />
       ) : null}
 
-      <div className="relative z-10 flex min-h-full flex-col items-center justify-center px-5 py-12 sm:px-6 sm:py-16">
+      <div
+        className={cn(
+          "relative z-10 flex min-h-full flex-col items-center justify-center",
+          compact ? "px-4 py-6" : "px-5 py-12 sm:px-6 sm:py-16",
+        )}
+      >
         <div
           className={cn(
             "w-full",
             theme.layout === "card"
-              ? "max-w-[440px] rounded-[30px] px-6 py-8 sm:px-7"
+              ? cn(
+                  "max-w-[440px]",
+                  compact ? "rounded-[22px] px-4 py-5" : "rounded-[30px] px-6 py-8 sm:px-7",
+                )
               : "max-w-[440px]",
           )}
           style={theme.layout === "card" ? cardStyle(theme) : undefined}
         >
-          <div className="flex flex-col gap-6">
+          <div className={cn("flex flex-col", compact ? "gap-4" : "gap-6")}>
             {visible.map((widget) => (
               <WidgetRenderer
                 key={widget.id}
@@ -116,12 +126,13 @@ export function ProfileCanvas({
                 socials={socials}
                 theme={theme}
                 interactive={interactive}
+                compact={compact}
               />
             ))}
           </div>
 
           {showBranding ? (
-            <div className="mt-7 flex justify-center">
+            <div className={cn("flex justify-center", compact ? "mt-5" : "mt-7")}>
               {interactive ? (
                 <Link
                   href="/"
@@ -153,6 +164,7 @@ function WidgetRenderer({
   socials,
   theme,
   interactive,
+  compact,
 }: {
   widget: CanvasWidget;
   profile: CanvasProfile;
@@ -160,12 +172,20 @@ function WidgetRenderer({
   socials: CanvasSocial[];
   theme: Theme;
   interactive: boolean;
+  compact: boolean;
 }) {
   if (!isWidgetType(widget.type)) return null;
 
   switch (widget.type as WidgetType) {
     case "header":
-      return <HeaderWidget config={parseWidgetConfig("header", widget.config)} profile={profile} theme={theme} />;
+      return (
+        <HeaderWidget
+          config={parseWidgetConfig("header", widget.config)}
+          profile={profile}
+          theme={theme}
+          compact={compact}
+        />
+      );
     case "links":
       return (
         <LinksWidget
@@ -173,6 +193,7 @@ function WidgetRenderer({
           links={links}
           theme={theme}
           interactive={interactive}
+          compact={compact}
         />
       );
     case "socials":
@@ -182,6 +203,7 @@ function WidgetRenderer({
           socials={socials}
           theme={theme}
           interactive={interactive}
+          compact={compact}
         />
       );
     case "text":
@@ -229,10 +251,12 @@ function HeaderWidget({
   config,
   profile,
   theme,
+  compact,
 }: {
   config: WidgetConfigMap["header"];
   profile: CanvasProfile;
   theme: Theme;
+  compact: boolean;
 }) {
   const centered = config.align === "center";
 
@@ -240,7 +264,10 @@ function HeaderWidget({
     <div className={cn("flex flex-col", centered ? "items-center text-center" : "items-start text-left")}>
       {config.showAvatar ? (
         <div
-          className="flex size-[88px] shrink-0 items-center justify-center overflow-hidden text-2xl font-semibold"
+          className={cn(
+            "flex shrink-0 items-center justify-center overflow-hidden font-semibold",
+            compact ? "size-16 text-xl" : "size-[88px] text-2xl",
+          )}
           style={{
             borderRadius: avatarRadius(theme.avatarShape),
             background: mix(theme.textColor, 12),
@@ -261,7 +288,12 @@ function HeaderWidget({
         </div>
       ) : null}
 
-      <h1 className="mt-4 text-[1.45rem] font-semibold leading-tight tracking-[-0.02em]">
+      <h1
+        className={cn(
+          "font-semibold leading-tight tracking-[-0.02em]",
+          compact ? "mt-3 text-xl" : "mt-4 text-[1.45rem]",
+        )}
+      >
         {profile.displayName}
       </h1>
 
@@ -273,7 +305,7 @@ function HeaderWidget({
 
       {config.showBio && profile.bio ? (
         <p
-          className="mt-3 max-w-[340px] text-sm leading-relaxed"
+          className={cn("max-w-[340px] leading-relaxed", compact ? "mt-2 text-xs" : "mt-3 text-sm")}
           style={{ color: theme.mutedColor }}
         >
           {profile.bio}
@@ -288,11 +320,13 @@ function LinksWidget({
   links,
   theme,
   interactive,
+  compact,
 }: {
   config: WidgetConfigMap["links"];
   links: CanvasLink[];
   theme: Theme;
   interactive: boolean;
+  compact: boolean;
 }) {
   if (links.length === 0) {
     return (
@@ -312,7 +346,9 @@ function LinksWidget({
   return (
     <div
       className={cn(
-        config.layout === "grid" ? "grid grid-cols-2 gap-2" : "flex flex-col gap-2.5",
+        config.layout === "grid"
+          ? "grid grid-cols-2 gap-2"
+          : cn("flex flex-col", compact ? "gap-2" : "gap-2.5"),
       )}
     >
       {links.map((link, index) => {
@@ -348,8 +384,9 @@ function LinksWidget({
         );
 
         const classes = cn(
-          "group flex w-full items-center gap-3 text-left",
-          config.layout === "grid" ? "px-3 py-3" : "px-4 py-3.5",
+          "group flex w-full items-center text-left",
+          compact ? "gap-2.5" : "gap-3",
+          config.layout === "grid" ? "px-3 py-3" : compact ? "px-3 py-2.5" : "px-4 py-3.5",
           interactive && "hover:-translate-y-0.5 hover:brightness-[1.03] active:translate-y-0",
         );
 
@@ -381,33 +418,41 @@ function SocialsWidget({
   socials,
   theme,
   interactive,
+  compact,
 }: {
   config: WidgetConfigMap["socials"];
   socials: CanvasSocial[];
   theme: Theme;
   interactive: boolean;
+  compact: boolean;
 }) {
   if (socials.length === 0) return null;
 
   const alignment = config.align === "center" ? "justify-center" : "justify-start";
 
   return (
-    <div className={cn("flex flex-wrap items-center gap-2", alignment)}>
+    <div className={cn("flex flex-wrap items-center", compact ? "gap-1.5" : "gap-2", alignment)}>
       {socials.map((social, index) => {
         const label = platformLabel(social.platform);
         const content =
           config.style === "pills" ? (
             <>
-              <PlatformIcon platform={social.platform} className="size-4" />
-              <span className="text-xs font-medium">{label}</span>
+              <PlatformIcon platform={social.platform} className={compact ? "size-3.5" : "size-4"} />
+              <span className={cn("font-medium", compact ? "text-[11px]" : "text-xs")}>{label}</span>
             </>
           ) : (
-            <PlatformIcon platform={social.platform} className="size-4" />
+            <PlatformIcon platform={social.platform} className={compact ? "size-3.5" : "size-4"} />
           );
 
         const className = cn(
           "inline-flex items-center justify-center transition",
-          config.style === "pills" ? "h-9 gap-2 px-3.5" : "size-10",
+          config.style === "pills"
+            ? compact
+              ? "h-8 gap-1.5 px-3"
+              : "h-9 gap-2 px-3.5"
+            : compact
+              ? "size-8"
+              : "size-10",
           interactive && "hover:-translate-y-0.5 hover:opacity-90",
         );
 

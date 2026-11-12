@@ -29,6 +29,7 @@ export function ProfilePreview({
   socials,
   theme,
   showBranding = true,
+  compact = false,
   className,
 }: {
   displayName: string;
@@ -39,6 +40,7 @@ export function ProfilePreview({
   socials: PreviewSocial[];
   theme: Theme;
   showBranding?: boolean;
+  compact?: boolean;
   className?: string;
 }) {
   const widgets: CanvasWidget[] = [
@@ -72,6 +74,7 @@ export function ProfilePreview({
       theme={theme}
       showBranding={showBranding}
       interactive={false}
+      compact={compact}
       className={cn("rounded-[28px] border border-black/10 shadow-xl", className)}
     />
   );
