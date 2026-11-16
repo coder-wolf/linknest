@@ -2,6 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import {
+  FREE_LINK_LIMIT,
+  canUseLinkIcons,
+  linkLimitForPlan,
+} from "@/lib/plan-access";
 import { prisma } from "@/lib/prisma";
 import { requireProfile } from "@/lib/session";
 import { httpUrlSchema, linkSchema } from "@/lib/validation";
@@ -33,7 +38,7 @@ export async function createLinkAction(
   _prev: LinkFormState,
   formData: FormData,
 ): Promise<LinkFormState> {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
   const parsed = linkSchema.safeParse({
     title: formData.get("title"),
     url: formData.get("url"),
@@ -41,8 +46,16 @@ export async function createLinkAction(
   });
   if (!parsed.success) return invalid(parsed.error);
 
+  const limit = linkLimitForPlan(user.subscription?.plan);
   const count = await prisma.link.count({ where: { profileId: profile.id } });
-  if (count >= 200) return { error: "You've reached the 200 link limit for now." };
+  if (count >= limit) {
+    return {
+      error:
+        limit === FREE_LINK_LIMIT
+          ? "Free pages can have up to 10 links. Remove one or upgrade to Pro."
+          : "You've reached the 200 link limit for now.",
+    };
+  }
 
   await prisma.link.create({
     data: {
@@ -55,6 +68,7 @@ export async function createLinkAction(
   });
 
   revalidatePath("/dashboard/links");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard");
   revalidatePath(`/${profile.username}`);
   return { success: "Link added" };
@@ -69,7 +83,7 @@ export async function updateLinkAction(
   _prev: LinkFormState,
   formData: FormData,
 ): Promise<LinkFormState> {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
   const parsed = updateSchema.safeParse({
     linkId: formData.get("linkId"),
     title: formData.get("title"),
@@ -81,9 +95,11 @@ export async function updateLinkAction(
 
   const link = await prisma.link.findFirst({
     where: { id: parsed.data.linkId, profileId: profile.id },
-    select: { id: true },
+    select: { id: true, iconUrl: true },
   });
   if (!link) return { error: "Link not found." };
+
+  const iconsAllowed = canUseLinkIcons(user.subscription?.plan);
 
   await prisma.link.update({
     where: { id: link.id },
@@ -91,11 +107,12 @@ export async function updateLinkAction(
       title: parsed.data.title,
       url: parsed.data.url,
       description: parsed.data.description || null,
-      iconUrl: parsed.data.iconUrl || null,
+      iconUrl: iconsAllowed ? parsed.data.iconUrl || null : link.iconUrl,
     },
   });
 
   revalidatePath("/dashboard/links");
+  revalidatePath("/dashboard");
   revalidatePath(`/${profile.username}`);
   return { success: "Link updated" };
 }
@@ -121,6 +138,7 @@ export async function deleteLinkAction(formData: FormData) {
 
   revalidatePath("/dashboard/links");
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard");
   revalidatePath(`/${profile.username}`);
 }
 
@@ -142,6 +160,7 @@ export async function toggleLinkAction(formData: FormData) {
 
   revalidatePath("/dashboard/links");
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard");
   revalidatePath(`/${profile.username}`);
 }
 
@@ -162,5 +181,6 @@ export async function reorderLinksAction(orderedIds: string[]) {
   );
 
   revalidatePath("/dashboard/links");
+  revalidatePath("/dashboard");
   revalidatePath(`/${profile.username}`);
 }

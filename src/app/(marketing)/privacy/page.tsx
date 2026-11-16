@@ -29,7 +29,7 @@ const sections = [
   },
   {
     title: "Your rights",
-    body: "You can access, correct or delete your data through the dashboard. For anything else, contact us at hello@linknest.com and we will respond within a reasonable period.",
+    body: "You can access, correct or delete your data through the dashboard. For anything else, contact us at hello@linknest.online and we will respond within a reasonable period.",
   },
   {
     title: "Changes",

@@ -85,6 +85,21 @@ export const httpUrlSchema = z
   .max(2048, "URL is too long")
   .refine(isHttpUrl, "Enter a valid http(s) URL");
 
+/**
+ * Social profile fields accept `instagram.com/name` and add the scheme for
+ * people, while still rejecting non-http(s) protocols.
+ */
+export const socialUrlSchema = z
+  .string()
+  .trim()
+  .max(2048, "URL is too long")
+  .transform((value) => {
+    if (!value) return value;
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value) || value.startsWith("//")) return value;
+    return `https://${value}`;
+  })
+  .pipe(httpUrlSchema);
+
 export const linkSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(80, "Title is too long"),
   url: httpUrlSchema,
@@ -93,7 +108,7 @@ export const linkSchema = z.object({
 
 export const socialSchema = z.object({
   platform: z.string().trim().min(1, "Choose a platform").max(40),
-  url: httpUrlSchema,
+  url: socialUrlSchema,
 });
 
 export const PLATFORMS = [

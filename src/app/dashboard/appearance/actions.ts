@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isPaidPlan, themeAccessIssue } from "@/lib/plan-access";
 import { prisma } from "@/lib/prisma";
 import { requireProfile } from "@/lib/session";
 import { themeSchema } from "@/lib/themes";
@@ -15,7 +16,7 @@ function text(formData: FormData, key: string) {
 }
 
 export async function updateThemeAction(_prev: ThemeState, formData: FormData): Promise<ThemeState> {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
 
   const backgroundImageUrl = text(formData, "backgroundImageUrl");
 
@@ -42,11 +43,18 @@ export async function updateThemeAction(_prev: ThemeState, formData: FormData): 
     return { error: parsed.error.issues[0]?.message ?? "Check your theme settings" };
   }
 
+  const accessIssue = themeAccessIssue(parsed.data, user.subscription?.plan);
+  if (accessIssue) return { error: accessIssue };
+
+  const theme = isPaidPlan(user.subscription?.plan)
+    ? parsed.data
+    : { ...parsed.data, backgroundImageUrl: null };
+
   await prisma.profile.update({
     where: { id: profile.id },
     data: {
-      theme: parsed.data,
-      backgroundImageUrl: parsed.data.backgroundImageUrl,
+      theme,
+      backgroundImageUrl: theme.backgroundImageUrl,
     },
   });
 

@@ -114,7 +114,7 @@ export function SocialManager({ socials }: { socials: ManagedSocial[] }) {
                 <Input
                   id="url"
                   name="url"
-                  placeholder="https://instagram.com/yourname"
+                  placeholder="instagram.com/yourname"
                   inputMode="url"
                   required
                 />
@@ -124,7 +124,9 @@ export function SocialManager({ socials }: { socials: ManagedSocial[] }) {
               </div>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <FieldHint className="mt-0">Up to 20 accounts.</FieldHint>
+              <FieldHint className="mt-0">
+                Paste a profile URL with or without https://. Up to 20 accounts.
+              </FieldHint>
               <SubmitButton size="sm" pendingLabel="Adding…">
                 <Plus className="size-3.5" /> Add account
               </SubmitButton>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ProfileCanvas, type CanvasWidget } from "@/components/profile-canvas";
 import { ViewTracker } from "@/components/view-tracker";
 import { prisma } from "@/lib/prisma";
+import { isPaidPlan } from "@/lib/plan-access";
 import { getSessionUser } from "@/lib/session";
 import { fontStack, parseTheme } from "@/lib/themes";
 import { STARTER_WIDGETS } from "@/lib/widgets";
@@ -50,6 +51,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${profile.displayName} (@${profile.username})`;
   const description =
     profile.bio ?? `${profile.displayName} on LinkNest — every link in one place.`;
+  const profileImage = profile.avatarUrl
+    ? [{ url: profile.avatarUrl }]
+    : [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "LinkNest landing page with a phone preview of a creator profile",
+        },
+      ];
 
   return {
     title,
@@ -60,13 +71,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       url: appUrl(`/${profile.username}`),
-      images: profile.avatarUrl ? [{ url: profile.avatarUrl }] : undefined,
+      images: profileImage,
     },
     twitter: {
-      card: "summary",
+      card: profile.avatarUrl ? "summary" : "summary_large_image",
       title,
       description,
-      images: profile.avatarUrl ? [profile.avatarUrl] : undefined,
+      images: profile.avatarUrl ? [profile.avatarUrl] : ["/og-image.png"],
     },
   };
 }
@@ -83,6 +94,10 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const theme = parseTheme(profile.theme);
   const plan = profile.user.subscription?.plan ?? "FREE";
   const showBranding = plan === "FREE";
+  const paid = isPaidPlan(plan);
+  const links = paid
+    ? profile.links
+    : profile.links.map((link) => ({ ...link, iconUrl: null }));
 
   const widgets: CanvasWidget[] =
     profile.widgets.length > 0
@@ -117,7 +132,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
           bio: profile.bio,
           avatarUrl: profile.avatarUrl,
         }}
-        links={profile.links}
+        links={links}
         socials={profile.socials}
         widgets={widgets}
         theme={theme}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { Check } from "lucide-react";
+import { useState, useTransition } from "react";
+import Link from "next/link";
+import { Check, Lock } from "lucide-react";
 import { ProfileCanvas, type CanvasWidget } from "@/components/profile-canvas";
 import { PhoneFrame } from "@/components/phone-frame";
 import { SubmitButton } from "@/components/submit-button";
@@ -23,9 +24,37 @@ import {
   type ThemePresetKey,
 } from "@/lib/themes";
 import { STARTER_WIDGETS } from "@/lib/widgets";
+import {
+  FREE_FONTS,
+  FREE_THEME_PRESETS,
+  UPGRADE_HREF,
+  isPaidPlan,
+  themeAccessIssue,
+} from "@/lib/plan-access";
 import { cn } from "@/lib/utils";
 
 const initialState: ThemeState = {};
+
+function themeFormData(theme: Theme) {
+  const formData = new FormData();
+  formData.set("preset", theme.preset);
+  formData.set("background", theme.background);
+  formData.set("textColor", theme.textColor);
+  formData.set("mutedColor", theme.mutedColor);
+  formData.set("accentColor", theme.accentColor);
+  formData.set("buttonColor", theme.buttonColor);
+  formData.set("buttonTextColor", theme.buttonTextColor);
+  formData.set("cardColor", theme.cardColor);
+  formData.set("buttonStyle", theme.buttonStyle);
+  formData.set("buttonShape", theme.buttonShape);
+  formData.set("shadow", theme.shadow);
+  formData.set("font", theme.font);
+  formData.set("layout", theme.layout);
+  formData.set("texture", theme.texture);
+  formData.set("avatarShape", theme.avatarShape);
+  formData.set("backgroundImageUrl", theme.backgroundImageUrl ?? "");
+  return formData;
+}
 
 type PreviewProfile = {
   displayName: string;
@@ -50,16 +79,58 @@ export function AppearanceForm({
   widgets: Array<{ id: string; type: string; isVisible: boolean; config: unknown }>;
   plan: string;
 }) {
-  const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [state, formAction] = useActionState(updateThemeAction, initialState);
+  const paid = isPaidPlan(plan);
+  const baselineTheme: Theme = paid
+    ? initialTheme
+    : { ...initialTheme, backgroundImageUrl: null };
+  const [theme, setTheme] = useState<Theme>(() => baselineTheme);
+  const [state, setState] = useState<ThemeState>(initialState);
+  const [pending, startTransition] = useTransition();
+  const accessIssue = themeAccessIssue(theme, plan);
+  const dirty = JSON.stringify(theme) !== JSON.stringify(baselineTheme);
+  const lockedPreview =
+    !paid && theme.preset !== "custom" && !FREE_THEME_PRESETS.includes(theme.preset);
+
+  function saveTheme(next: Theme) {
+    startTransition(async () => {
+      const result = await updateThemeAction(state, themeFormData(next));
+      setState(result);
+    });
+  }
+
+  async function handleSubmit(formData: FormData) {
+    const result = await updateThemeAction(state, formData);
+    setState(result);
+  }
 
   function applyPreset(key: ThemePresetKey) {
     const preset = THEME_PRESETS[key].theme;
-    setTheme({ ...preset, backgroundImageUrl: theme.backgroundImageUrl });
+    const next = {
+      ...preset,
+      backgroundImageUrl: paid ? theme.backgroundImageUrl : null,
+    };
+    setTheme(next);
+
+    // Free users can preview Pro themes, but only save themes their plan allows.
+    if (!paid && !FREE_THEME_PRESETS.includes(key)) return;
+    saveTheme(next);
   }
 
   function update<K extends keyof Theme>(key: K, value: Theme[K]) {
-    setTheme((current) => ({ ...current, preset: "custom", [key]: value }));
+    setTheme((current) => {
+      // Keep a locked Pro preset attached while the user previews it, so
+      // editing a color can't turn it into a saveable "custom" theme.
+      const keepLockedPreset =
+        !paid &&
+        current.preset !== "custom" &&
+        !FREE_THEME_PRESETS.includes(current.preset);
+
+      return {
+        ...current,
+        preset: keepLockedPreset ? current.preset : "custom",
+        [key]: value,
+      };
+    });
   }
 
   const canvasWidgets: CanvasWidget[] =
@@ -74,7 +145,7 @@ export function AppearanceForm({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-      <form action={formAction} className="space-y-4">
+      <form action={handleSubmit} className="space-y-4">
         <input type="hidden" name="preset" value={theme.preset} />
         <input type="hidden" name="background" value={theme.background} />
         <input type="hidden" name="textColor" value={theme.textColor} />
@@ -93,28 +164,49 @@ export function AppearanceForm({
 
         {state.error ? <Alert tone="error">{state.error}</Alert> : null}
         {state.success ? <Alert tone="success">{state.success}</Alert> : null}
+        {dirty && !pending && !lockedPreview ? (
+          <Alert tone="info">
+            You have unsaved theme changes. Save the theme to see them on your live page.
+          </Alert>
+        ) : null}
+        {!paid && accessIssue ? (
+          <Alert tone="info">
+            <span className="font-medium">View only.</span> {accessIssue}{" "}
+            <Link href={UPGRADE_HREF} className="font-semibold underline underline-offset-4">
+              See Pro
+            </Link>
+          </Alert>
+        ) : null}
 
         <Card>
           <CardHeader>
             <h2 className="text-sm font-semibold">Theme presets</h2>
             <p className="text-xs text-muted">
-              Ten starting points — pick one, then tune every detail below.
+              Fifteen starting points — pick one, then tune every detail below.
             </p>
           </CardHeader>
           <CardBody className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {THEME_PRESET_KEYS.map((key) => {
               const preset = THEME_PRESETS[key];
               const active = theme.preset === key;
+              const locked = !paid && !FREE_THEME_PRESETS.includes(key);
               return (
                 <button
                   key={key}
                   type="button"
                   onClick={() => applyPreset(key)}
+                  disabled={pending}
                   className={cn(
-                    "group relative overflow-hidden rounded-xl border p-2.5 text-left transition",
+                    "group relative overflow-hidden rounded-xl border p-2.5 text-left transition disabled:opacity-60",
                     active ? "border-ink ring-2 ring-ink/10" : "border-border hover:border-ink/30",
                   )}
                 >
+                  {locked ? (
+                    <span className="absolute right-2 top-2 z-10 inline-flex items-center gap-1 rounded-full bg-ink px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
+                      <Lock className="size-2.5" />
+                      Pro
+                    </span>
+                  ) : null}
                   <span
                     className="flex h-20 w-full flex-col items-center justify-center gap-1.5 overflow-hidden rounded-lg px-3"
                     style={presetSwatchStyle(preset.theme)}
@@ -133,7 +225,15 @@ export function AppearanceForm({
                   </span>
                   <span className="mt-2 flex items-center justify-between gap-1">
                     <span className="text-xs font-medium">{preset.label}</span>
-                    {active ? <Check className="size-3.5 shrink-0 text-ink" /> : null}
+                    <span className="flex items-center gap-1">
+                      {active ? <Check className="size-3.5 shrink-0 text-ink" /> : null}
+                      {locked ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-muted">
+                          <Lock className="size-3" />
+                          Pro
+                        </span>
+                      ) : null}
+                    </span>
                   </span>
                   <span className="mt-0.5 line-clamp-2 block text-[10px] leading-snug text-muted">
                     {preset.description}
@@ -205,17 +305,34 @@ export function AppearanceForm({
               />
             </div>
 
-            <div>
-              <Label htmlFor="backgroundImageUrl">Background image URL (optional)</Label>
-              <Input
-                id="backgroundImageUrl"
-                name="backgroundImageUrl"
-                defaultValue={theme.backgroundImageUrl ?? ""}
-                placeholder="https://example.com/texture.jpg"
-                onChange={(event) => update("backgroundImageUrl", event.target.value || null)}
-              />
-              <FieldHint>The image is layered behind your colors at reduced opacity.</FieldHint>
-            </div>
+            {paid ? (
+              <div>
+                <Label htmlFor="backgroundImageUrl">Background image URL (optional)</Label>
+                <Input
+                  id="backgroundImageUrl"
+                  name="backgroundImageUrl"
+                  defaultValue={theme.backgroundImageUrl ?? ""}
+                  placeholder="https://example.com/texture.jpg"
+                  onChange={(event) => update("backgroundImageUrl", event.target.value || null)}
+                />
+                <FieldHint>The image is layered behind your colors at reduced opacity.</FieldHint>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-border bg-surface-muted/40 p-4">
+                <p className="flex items-center gap-1.5 text-sm font-medium">
+                  <Lock className="size-3.5" /> Custom background images
+                </p>
+                <p className="mt-1 text-xs text-muted">
+                  Add a photo or texture behind your theme on Pro.
+                </p>
+                <Link
+                  href={UPGRADE_HREF}
+                  className="mt-2 inline-flex text-xs font-semibold text-foreground underline underline-offset-4"
+                >
+                  Upgrade to Pro
+                </Link>
+              </div>
+            )}
           </CardBody>
         </Card>
 
@@ -322,11 +439,15 @@ export function AppearanceForm({
                 value={theme.font}
                 onChange={(event) => update("font", event.target.value as Theme["font"])}
               >
-                {FONT_OPTIONS.map((font) => (
-                  <option key={font.key} value={font.key}>
-                    {font.label}
-                  </option>
-                ))}
+                {FONT_OPTIONS.map((font) => {
+                  const locked = !paid && !FREE_FONTS.includes(font.key);
+                  return (
+                    <option key={font.key} value={font.key} disabled={locked}>
+                      {font.label}
+                      {locked ? " — Pro" : ""}
+                    </option>
+                  );
+                })}
               </Select>
             </div>
             <div>
@@ -337,7 +458,9 @@ export function AppearanceForm({
                 onChange={(event) => update("layout", event.target.value as Theme["layout"])}
               >
                 <option value="classic">Classic — open page</option>
-                <option value="card">Card — framed profile</option>
+                <option value="card" disabled={!paid}>
+                  Card — framed profile{!paid ? " (Pro)" : ""}
+                </option>
               </Select>
             </div>
           </CardBody>
@@ -345,16 +468,29 @@ export function AppearanceForm({
 
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs text-muted">
-            Changes appear on your live page as soon as you save.
+            Theme presets apply instantly. Save to keep color, type and layout tweaks.
           </p>
-          <SubmitButton pendingLabel="Saving…">Save appearance</SubmitButton>
+          <SubmitButton
+            pendingLabel="Saving…"
+            disabled={pending || (!paid && Boolean(accessIssue))}
+          >
+            Save appearance
+          </SubmitButton>
         </div>
       </form>
 
       <div className="lg:sticky lg:top-24">
-        <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.16em] text-muted">
-          Live preview
-        </p>
+        <div className="mb-3 flex items-center justify-center gap-2">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
+            Live preview
+          </p>
+          {lockedPreview ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-ink px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white">
+              <Lock className="size-2.5" />
+              Pro theme
+            </span>
+          ) : null}
+        </div>
         <PhoneFrame width="w-full max-w-[340px]" statusColor={theme.textColor}>
           <div className="no-scrollbar h-full overflow-y-auto">
             <ProfileCanvas

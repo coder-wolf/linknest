@@ -80,7 +80,7 @@ const faqs = [
   {
     question: "Do I need a credit card?",
     answer:
-      "No. The free plan is genuinely free: one profile, unlimited basic links, a real theme and basic analytics. No payment details required.",
+      "No. The free plan is genuinely free: one profile, up to 10 basic links, a real theme and basic analytics. No payment details required.",
   },
   {
     question: "Can I change the layout after publishing?",
@@ -107,15 +107,15 @@ export default function HomePage() {
         <div aria-hidden className="grid-lines mask-fade-b pointer-events-none absolute inset-0 opacity-60" />
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-40 -top-48 size-[560px] rounded-full bg-[#ffd9c7] opacity-60 blur-3xl"
+          className="pointer-events-none absolute -left-40 -top-48 size-[560px] rounded-full bg-[#ffd9c7] opacity-60 blur-3xl dark:opacity-15"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-32 top-24 size-[500px] rounded-full bg-[#e6d5ff] opacity-60 blur-3xl"
+          className="pointer-events-none absolute -right-32 top-24 size-[500px] rounded-full bg-[#e6d5ff] opacity-60 blur-3xl dark:opacity-15"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute bottom-0 left-1/3 size-[440px] rounded-full bg-[#c9f5e7] opacity-50 blur-3xl"
+          className="pointer-events-none absolute bottom-0 left-1/3 size-[440px] rounded-full bg-[#c9f5e7] opacity-50 blur-3xl dark:opacity-10"
         />
 
         <div className="container-page relative grid items-center gap-14 pb-20 pt-12 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:pb-28 lg:pt-20">
@@ -128,7 +128,7 @@ export default function HomePage() {
                 <Sparkles className="size-3" />
                 New
               </span>
-              Widgets, embeds &amp; ten themes
+              Widgets, embeds &amp; fifteen themes
               <ArrowUpRight className="size-3.5 text-muted transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
 
@@ -159,7 +159,7 @@ export default function HomePage() {
 
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
               A link-in-bio that finally feels like your work. Compose your page from widgets,
-              dress it in one of ten considered themes, and see exactly what your audience clicks.
+              dress it in one of fifteen considered themes, and see exactly what your audience clicks.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -201,7 +201,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-xs leading-relaxed text-muted">
-                <span className="font-semibold text-foreground">10 themes</span> · 9 widget types · 13
+                <span className="font-semibold text-foreground">15 themes</span> · 9 widget types · 13
                 socials
                 <br />
                 one page that finally looks like you.
@@ -342,7 +342,7 @@ export default function HomePage() {
                   <p className="text-2xl font-semibold tracking-tight">12,480</p>
                   <p className="text-[10px] text-muted">views this month</p>
                 </div>
-                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+                <span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                   +38%
                 </span>
               </div>
@@ -419,7 +419,7 @@ export default function HomePage() {
             body="Mobile-first, semantic and accessible. No heavy page builder slowing down your link."
           >
             <div className="mt-5 flex items-center gap-3">
-              <span className="flex size-16 shrink-0 flex-col items-center justify-center rounded-full border-4 border-emerald-500/20 bg-emerald-50 text-emerald-700">
+              <span className="flex size-16 shrink-0 flex-col items-center justify-center rounded-full border-4 border-emerald-500/20 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                 <span className="text-lg font-semibold leading-none">100</span>
                 <span className="text-[7px] font-semibold uppercase tracking-wider">score</span>
               </span>
@@ -445,7 +445,7 @@ export default function HomePage() {
               <div className="h-10 bg-gradient-to-r from-[#ffe4ee] via-[#f6dcea] to-[#e6d5ff]" />
               <div className="px-2.5 py-2">
                 <p className="text-[10px] font-semibold">Mima Sánchez — Illustrator</p>
-                <p className="mt-0.5 text-[9px] text-muted">linknest.com/mima</p>
+                <p className="mt-0.5 text-[9px] text-muted">linknest.online/mima</p>
               </div>
             </div>
           </FeatureCard>
@@ -455,14 +455,14 @@ export default function HomePage() {
             icon={Sparkles}
             eyebrow="Pricing"
             title="Start at zero."
-            body="Unlimited basic links, a real theme and analytics — free forever. Upgrade only when you need more."
+            body="Up to 10 basic links, a real theme and analytics — free forever. Upgrade only when you need more."
           >
             <div className="mt-5 rounded-xl border border-border/70 bg-surface p-3">
               <p className="font-serif text-2xl">$0</p>
               <p className="text-[10px] text-muted">forever · no card</p>
               <p className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
                 <Check className="size-3" />
-                One profile, unlimited links
+                One profile, up to 10 links
               </p>
             </div>
           </FeatureCard>
@@ -470,7 +470,7 @@ export default function HomePage() {
       </section>
 
       {/* Builder */}
-      <section id="builder" className="relative scroll-mt-16 overflow-hidden bg-ink py-20 text-white lg:py-28">
+      <section id="builder" className="relative scroll-mt-16 overflow-hidden bg-[#17160f] py-20 text-white lg:py-28">
         <div aria-hidden className="absolute inset-0 opacity-[0.07]">
           <div className="grid-lines size-full" />
         </div>
@@ -521,7 +521,7 @@ export default function HomePage() {
                 {
                   icon: Sparkles,
                   title: "Nine widget types",
-                  body: "Header, links, socials, text, image, video, music, CTA, divider.",
+                  body: "Free includes 6 widgets, Pro unlocks up to 24. Header, links, socials, text, image, video, music, CTA, divider.",
                 },
               ].map((item) => {
                 const Icon = item.icon;
@@ -541,7 +541,7 @@ export default function HomePage() {
 
             <Link
               href="/signup"
-              className="group mt-9 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-ink transition hover:-translate-y-0.5 hover:bg-white/90"
+              className="group mt-9 inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-[#17160f] transition hover:-translate-y-0.5 hover:bg-white/90"
             >
               Try the builder
               <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
@@ -554,7 +554,7 @@ export default function HomePage() {
 
       {/* Analytics */}
       <section className="relative overflow-hidden py-16 lg:py-24">
-        <div aria-hidden className="pointer-events-none absolute right-0 top-20 size-[420px] rounded-full bg-[#c9f5e7] opacity-40 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute right-0 top-20 size-[420px] rounded-full bg-[#c9f5e7] opacity-40 blur-3xl dark:opacity-10" />
         <div className="container-page relative grid items-center gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
@@ -576,7 +576,7 @@ export default function HomePage() {
                 "Cookieless by default — no personal profiles",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5 text-sm">
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
                     <Check className="size-3" />
                   </span>
                   {item}
@@ -613,7 +613,7 @@ export default function HomePage() {
                 Themes
               </p>
               <h2 className="mt-3 font-serif text-3xl tracking-tight sm:text-4xl lg:text-5xl">
-                Ten themes. Then make it yours.
+                Fifteen themes. Then make it yours.
               </h2>
             </div>
             <div className="max-w-md">
@@ -710,15 +710,15 @@ export default function HomePage() {
                 </span>
                 <div className="mx-1 flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-[11px] text-muted">
                   <Globe2 className="size-3 shrink-0" />
-                  <span className="truncate">linknest.com/yourname</span>
+                  <span className="truncate">linknest.online/yourname</span>
                 </div>
                 <CopyButton
-                  value="https://link-in-bio-six-self.vercel.app/yourname"
+                  value="https://linknest.online/yourname"
                   label="Copy"
                 />
               </div>
               <div className="bg-gradient-to-b from-surface-muted/60 to-surface p-3 sm:p-5">
-                <div className="overflow-hidden rounded-[20px] border border-black/5 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-[20px] border border-border/70 bg-surface shadow-sm">
                   <div className="h-[420px] overflow-hidden">
                     <ProfilePreview
                       displayName="Mima Sánchez"
@@ -770,7 +770,7 @@ export default function HomePage() {
                   className={cn(
                     "relative flex flex-col rounded-[24px] border p-5 sm:p-6",
                     dark
-                      ? "border-ink bg-ink text-white shadow-xl"
+                      ? "border-ink bg-[#17160f] text-white shadow-xl"
                       : "border-border bg-surface",
                   )}
                 >
@@ -821,7 +821,7 @@ export default function HomePage() {
                     className={cn(
                       "mt-5 inline-flex h-10 items-center justify-center rounded-full text-xs font-semibold transition",
                       dark
-                        ? "bg-white text-ink hover:bg-white/90"
+                        ? "bg-white text-[#17160f] hover:bg-white/90"
                         : "border border-border bg-surface hover:bg-surface-muted",
                     )}
                   >
@@ -832,7 +832,7 @@ export default function HomePage() {
             })}
           </div>
           <p className="mt-4 text-xs text-muted">
-            Start free today. Paid plans are shown for comparison while payments are being finalized.
+            Start free today. Paid plans are billed monthly through Lemon Squeezy.
           </p>
         </div>
       </section>
@@ -876,7 +876,7 @@ export default function HomePage() {
 
       {/* Final CTA */}
       <section className="container-page pb-20">
-        <div className="relative overflow-hidden rounded-[36px] bg-ink px-6 py-16 text-white sm:px-12 lg:py-20">
+        <div className="relative overflow-hidden rounded-[36px] bg-[#17160f] px-6 py-16 text-white sm:px-12 lg:py-20">
           <div aria-hidden className="absolute inset-0 opacity-[0.08]">
             <div className="grid-lines size-full" />
           </div>

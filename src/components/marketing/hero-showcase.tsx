@@ -21,9 +21,9 @@ const sampleSocials = [
 ];
 
 const choices: Array<{ key: ThemePresetKey; label: string; dot: string }> = [
+  { key: "creative", label: "Pop", dot: "#ff5d73" },
   { key: "bloom", label: "Bloom", dot: "#d23f7a" },
   { key: "gradient", label: "Aurora", dot: "#7cf2d4" },
-  { key: "creative", label: "Pop", dot: "#ff5d73" },
   { key: "minimal", label: "Paper", dot: "#b4442f" },
   { key: "terminal", label: "Terminal", dot: "#3dff8a" },
 ];
@@ -31,14 +31,14 @@ const choices: Array<{ key: ThemePresetKey; label: string; dot: string }> = [
 const bars = [38, 54, 44, 68, 58, 82, 96];
 
 export function HeroShowcase() {
-  const [themeKey, setThemeKey] = useState<ThemePresetKey>("bloom");
+  const [themeKey, setThemeKey] = useState<ThemePresetKey>("creative");
   const theme = THEME_PRESETS[themeKey].theme;
 
   return (
     <div className="isolate relative mx-auto w-full max-w-[440px]">
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_120deg,#ffd9c7,#e6d5ff,#c9f5e7,#ffe1ee,#ffd9c7)] opacity-70 blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_120deg,#ffd9c7,#e6d5ff,#c9f5e7,#ffe1ee,#ffd9c7)] opacity-70 blur-3xl dark:opacity-20"
       />
       <div
         aria-hidden
@@ -63,13 +63,13 @@ export function HeroShowcase() {
         </PhoneFrame>
       </div>
 
-      <div className="animate-float absolute -left-24 top-20 z-20 hidden w-[158px] rounded-2xl border border-black/5 bg-white/90 p-3.5 shadow-[0_20px_45px_-20px_rgba(23,22,15,0.45)] backdrop-blur sm:block">
+      <div className="animate-float absolute -left-24 top-20 z-20 hidden w-[158px] rounded-2xl border border-border/70 bg-surface/95 p-3.5 shadow-[0_20px_45px_-20px_rgba(23,22,15,0.45)] backdrop-blur sm:block">
         <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-muted">
           Views this week
         </p>
         <div className="mt-1 flex items-end justify-between gap-2">
           <span className="text-2xl font-semibold tracking-tight">2,418</span>
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
             <TrendingUp className="size-3" />
             38%
           </span>
@@ -85,10 +85,10 @@ export function HeroShowcase() {
         </div>
       </div>
 
-      <div className="animate-float-delayed absolute -right-20 bottom-24 z-20 hidden w-[154px] rounded-2xl border border-black/5 bg-white/90 p-3.5 shadow-[0_20px_45px_-20px_rgba(23,22,15,0.45)] backdrop-blur xl:block">
+      <div className="animate-float-delayed absolute -right-20 bottom-24 z-20 hidden w-[154px] rounded-2xl border border-border/70 bg-surface/95 p-3.5 shadow-[0_20px_45px_-20px_rgba(23,22,15,0.45)] backdrop-blur xl:block">
         <div className="flex items-center justify-between">
           <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-muted">Widgets</p>
-          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-emerald-700">
+          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-emerald-700 dark:text-emerald-300">
             <span className="animate-pulse-dot size-1.5 rounded-full bg-emerald-500" />
             Live
           </span>

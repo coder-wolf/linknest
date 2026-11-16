@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { z } from "zod";
+import { httpUrlSchema } from "@/lib/validation";
 
 export const FONT_OPTIONS = [
   { key: "sans", label: "Modern sans", stack: "var(--font-geist-sans)" },
@@ -64,7 +65,12 @@ export type ThemePresetKey =
   | "sage"
   | "riso"
   | "terminal"
-  | "bloom";
+  | "bloom"
+  | "ember"
+  | "tide"
+  | "mono"
+  | "citrus"
+  | "dusk";
 
 export const THEME_PRESET_KEYS = [
   "minimal",
@@ -77,6 +83,11 @@ export const THEME_PRESET_KEYS = [
   "riso",
   "terminal",
   "bloom",
+  "ember",
+  "tide",
+  "mono",
+  "citrus",
+  "dusk",
 ] as const;
 
 export type Theme = {
@@ -324,6 +335,119 @@ export const THEME_PRESETS: Record<
       backgroundImageUrl: null,
     },
   },
+  ember: {
+    label: "Ember",
+    description: "Firelit charcoal, burnt orange and a soft glow.",
+    theme: {
+      preset: "ember",
+      background:
+        "radial-gradient(120% 100% at 50% 0%, #2a120c 0%, #0c0807 65%)",
+      textColor: "#fff1e6",
+      mutedColor: "#c9a796",
+      accentColor: "#ff8a3d",
+      buttonColor: "#ff8a3d",
+      buttonTextColor: "#20100a",
+      cardColor: "#1a0f0b",
+      buttonStyle: "solid",
+      buttonShape: "pill",
+      shadow: "hard",
+      font: "grotesk",
+      layout: "classic",
+      texture: "noise",
+      avatarShape: "squircle",
+      backgroundImageUrl: null,
+    },
+  },
+  tide: {
+    label: "Tide",
+    description: "Deep ocean gradients with sea-glass and warm sand.",
+    theme: {
+      preset: "tide",
+      background:
+        "linear-gradient(165deg, #052d33 0%, #0a4f57 55%, #0b6b6a 100%)",
+      textColor: "#ecfffb",
+      mutedColor: "#9fd6cf",
+      accentColor: "#ffd166",
+      buttonColor: "#ffffff",
+      buttonTextColor: "#073b3d",
+      cardColor: "rgba(255, 255, 255, 0.08)",
+      buttonStyle: "glass",
+      buttonShape: "rounded",
+      shadow: "soft",
+      font: "sans",
+      layout: "card",
+      texture: "grid",
+      avatarShape: "circle",
+      backgroundImageUrl: null,
+    },
+  },
+  mono: {
+    label: "Mono",
+    description: "Stark editorial black and white with boxed type.",
+    theme: {
+      preset: "mono",
+      background: "#f2f2ef",
+      textColor: "#0d0d0d",
+      mutedColor: "#6b6b66",
+      accentColor: "#0d0d0d",
+      buttonColor: "#0d0d0d",
+      buttonTextColor: "#f7f7f4",
+      cardColor: "#ffffff",
+      buttonStyle: "solid",
+      buttonShape: "square",
+      shadow: "hard",
+      font: "mono",
+      layout: "classic",
+      texture: "none",
+      avatarShape: "square",
+      backgroundImageUrl: null,
+    },
+  },
+  citrus: {
+    label: "Citrus",
+    description: "Zesty lime and ink with playful offset shadows.",
+    theme: {
+      preset: "citrus",
+      background: "#f4f7d4",
+      textColor: "#1b2410",
+      mutedColor: "#5e6a45",
+      accentColor: "#d7ff3f",
+      buttonColor: "#1b2410",
+      buttonTextColor: "#f6ffd9",
+      cardColor: "#fbffe8",
+      buttonStyle: "solid",
+      buttonShape: "pill",
+      shadow: "hard",
+      font: "grotesk",
+      layout: "classic",
+      texture: "dots",
+      avatarShape: "circle",
+      backgroundImageUrl: null,
+    },
+  },
+  dusk: {
+    label: "Dusk",
+    description: "Lavender twilight, glass cards and a rosy accent.",
+    theme: {
+      preset: "dusk",
+      background:
+        "linear-gradient(160deg, #1d1730 0%, #2a2148 50%, #3b2b5e 100%)",
+      textColor: "#f4efff",
+      mutedColor: "#b9add8",
+      accentColor: "#ffb3d9",
+      buttonColor: "#ffb3d9",
+      buttonTextColor: "#2a1630",
+      cardColor: "rgba(255, 255, 255, 0.07)",
+      buttonStyle: "glass",
+      buttonShape: "rounded",
+      shadow: "soft",
+      font: "serif",
+      layout: "card",
+      texture: "noise",
+      avatarShape: "squircle",
+      backgroundImageUrl: null,
+    },
+  },
 };
 
 export const DEFAULT_THEME: Theme = THEME_PRESETS.minimal.theme;
@@ -351,7 +475,7 @@ export const themeSchema = z.object({
   layout: z.enum(["classic", "card"]),
   texture: z.enum(["none", "noise", "grid", "dots"]),
   avatarShape: z.enum(["circle", "squircle", "square"]),
-  backgroundImageUrl: z.string().trim().max(2048).nullable(),
+  backgroundImageUrl: z.union([z.literal(""), httpUrlSchema]).nullable(),
 });
 
 export function isThemePresetKey(value: string): value is ThemePresetKey {

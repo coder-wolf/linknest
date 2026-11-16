@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getSessionUser } from "@/lib/session";
 
 export async function SiteHeader() {
@@ -26,6 +27,7 @@ export async function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           {user ? (
             <Link
               href={user.profile ? "/dashboard" : "/onboarding"}

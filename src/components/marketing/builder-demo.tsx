@@ -128,7 +128,7 @@ export function BuilderDemo() {
                     dropOn(item.key);
                   }}
                   className={cn(
-                    "flex items-center gap-2 rounded-xl border bg-white px-2 py-2 transition",
+                    "flex items-center gap-2 rounded-xl border bg-surface px-2 py-2 transition",
                     dragging
                       ? "border-ink/30 opacity-50 shadow-lg"
                       : "border-border/80 hover:border-ink/20",

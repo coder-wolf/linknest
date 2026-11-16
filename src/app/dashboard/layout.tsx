@@ -3,6 +3,7 @@ import { ExternalLink, Sparkles } from "lucide-react";
 import { logoutAction } from "@/app/(auth)/actions";
 import { DashboardNav } from "@/components/dashboard/nav";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/card";
 import { requireProfile } from "@/lib/session";
 import { initials } from "@/lib/utils";
@@ -22,7 +23,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         <div className="mt-auto space-y-4 px-1">
           {plan === "FREE" ? (
-            <div className="rounded-2xl bg-ink p-4 text-white">
+            <div className="rounded-2xl bg-[#17160f] p-4 text-white">
               <Sparkles className="size-5 text-accent" />
               <p className="mt-2 text-sm font-semibold">Make it unmistakably yours</p>
               <p className="mt-1 text-xs text-white/65">
@@ -75,10 +76,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <Badge tone="warning">Unpublished</Badge>
               )}
               <span className="text-sm text-muted">
-                linknest.com/<span className="font-medium text-foreground">{profile.username}</span>
+                linknest.online/<span className="font-medium text-foreground">{profile.username}</span>
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <Link
                 href={`/${profile.username}`}
                 target="_blank"

@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import { CopyButton } from "@/components/copy-button";
 import { SubmitButton } from "@/components/submit-button";
-import { Badge, Card, CardBody, CardHeader, EmptyState } from "@/components/ui/card";
+import { Card, CardBody, CardHeader, EmptyState } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { requireProfile } from "@/lib/session";
 import { formatNumber, initials, profileUrl } from "@/lib/utils";
 import { setPublishedAction } from "./actions";
+import { DashboardLinks } from "./dashboard-links";
+import { ProfileIdentity } from "./profile-identity";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -58,17 +60,19 @@ export default async function DashboardPage({
   return (
     <div className="space-y-6">
       {welcome ? (
-        <div className="flex flex-col gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-emerald-900 dark:bg-emerald-950/50">
           <div>
-            <p className="text-sm font-semibold text-emerald-900">Your page is ready 🎉</p>
-            <p className="text-sm text-emerald-800">
+            <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
+              Your page is ready 🎉
+            </p>
+            <p className="text-sm text-emerald-800 dark:text-emerald-300">
               Preview it, then publish when you&apos;re happy. You can keep editing any time.
             </p>
           </div>
           <Link
             href={`/${profile.username}`}
             target="_blank"
-            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-emerald-900 underline underline-offset-4"
+            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-emerald-900 underline underline-offset-4 dark:text-emerald-200"
           >
             Preview page <ArrowUpRight className="size-4" />
           </Link>
@@ -93,21 +97,14 @@ export default async function DashboardPage({
                 initials(profile.displayName || profile.username)
               )}
             </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="truncate text-lg font-semibold">{profile.displayName}</p>
-                {profile.isPublished ? (
-                  <Badge tone="success">Live</Badge>
-                ) : (
-                  <Badge tone="warning">Draft</Badge>
-                )}
-              </div>
-              <p className="text-sm text-muted">@{profile.username}</p>
-              {profile.bio ? (
-                <p className="mt-2 max-w-xl text-sm text-muted">{profile.bio}</p>
-              ) : (
-                <p className="mt-2 text-sm text-muted">No bio yet — add one in settings.</p>
-              )}
+            <div className="min-w-0 flex-1">
+              <ProfileIdentity
+                displayName={profile.displayName}
+                username={profile.username}
+                bio={profile.bio}
+                avatarUrl={profile.avatarUrl}
+                isPublished={profile.isPublished}
+              />
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <span className="inline-flex h-9 items-center rounded-full bg-surface-muted px-3 text-sm text-muted">
                   {url.replace(/^https?:\/\//, "")}
@@ -165,7 +162,9 @@ export default async function DashboardPage({
           <CardHeader className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-semibold">Your links</h2>
-              <p className="text-xs text-muted">The first four, in display order.</p>
+              <p className="text-xs text-muted">
+                The first four in display order — edit any of them right here.
+              </p>
             </div>
             <Link
               href="/dashboard/links"
@@ -189,21 +188,7 @@ export default async function DashboardPage({
                 }
               />
             ) : (
-              recentLinks.map((link) => (
-                <div
-                  key={link.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-border px-3.5 py-3"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{link.title}</p>
-                    <p className="truncate text-xs text-muted">{link.url}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3 text-xs text-muted">
-                    {!link.isActive ? <Badge>Hidden</Badge> : null}
-                    <span>{formatNumber(link.clicks)} clicks</span>
-                  </div>
-                </div>
-              ))
+              <DashboardLinks links={recentLinks} />
             )}
           </CardBody>
         </Card>

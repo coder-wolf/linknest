@@ -25,7 +25,8 @@ async function main() {
     data: {
       email,
       passwordHash,
-      subscription: { create: { plan: "FREE" } },
+      emailVerified: new Date(),
+      subscription: { create: { plan: "PRO" } },
       profile: {
         create: {
           username: "mima",

@@ -20,6 +20,14 @@ export async function clientKey(prefix: string) {
  */
 export function rateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
+
+  // Keep the map from growing without bound on long-lived instances.
+  if (buckets.size > 10_000) {
+    for (const [bucketKey, bucket] of buckets) {
+      if (bucket.resetAt <= now) buckets.delete(bucketKey);
+    }
+  }
+
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {

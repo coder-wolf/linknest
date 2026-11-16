@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { isPaidPlan } from "@/lib/plan-access";
 import { requireProfile } from "@/lib/session";
 import { parseTheme } from "@/lib/themes";
 import { AppearanceForm } from "./appearance-form";
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: "Appearance" };
 
 export default async function AppearancePage() {
   const { user, profile } = await requireProfile();
+  const plan = user.subscription?.plan ?? "FREE";
 
   const [links, socials, widgets] = await Promise.all([
     prisma.link.findMany({
@@ -30,6 +32,10 @@ export default async function AppearancePage() {
       select: { id: true, type: true, isVisible: true, config: true },
     }),
   ]);
+
+  const previewLinks = isPaidPlan(plan)
+    ? links
+    : links.map((link) => ({ ...link, iconUrl: null }));
 
   return (
     <div className="space-y-6">
@@ -58,10 +64,10 @@ export default async function AppearancePage() {
           avatarUrl: profile.avatarUrl,
           isPublished: profile.isPublished,
         }}
-        links={links}
+        links={previewLinks}
         socials={socials}
         widgets={widgets}
-        plan={user.subscription?.plan ?? "FREE"}
+        plan={plan}
       />
     </div>
   );

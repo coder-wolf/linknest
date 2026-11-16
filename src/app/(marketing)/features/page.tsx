@@ -17,7 +17,7 @@ const groups = [
     title: "Links that stay organized",
     body: "Add, edit, hide and reorder links with drag-and-drop or keyboard arrows. Add a description, a thumbnail and click tracking to each one.",
     points: [
-      "Unlimited links on every plan",
+      "10 links free, up to 200 on Pro",
       "Drag-and-drop ordering",
       "Show or hide individual links",
       "Optional descriptions and icons",

@@ -6,15 +6,23 @@ export async function getSessionUser() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: { profile: true, subscription: true },
   });
+  if (!user) return null;
+
+  // Password changes and resets bump this counter, revoking every older JWT.
+  const tokenVersion = (session.user as { sessionVersion?: number }).sessionVersion ?? 0;
+  if (tokenVersion !== user.sessionVersion) return null;
+
+  return user;
 }
 
 export async function requireUser() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
+  if (!user.emailVerified) redirect("/verify-email");
   return user;
 }
 

@@ -2,6 +2,7 @@
 
 import { useActionState, useMemo, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import {
   ChevronDown,
@@ -36,6 +37,11 @@ import { FieldHint, Input, Label, Select, Textarea } from "@/components/ui/field
 import { SubmitButton } from "@/components/submit-button";
 import { cn } from "@/lib/utils";
 import type { Theme } from "@/lib/themes";
+import {
+  FREE_WIDGET_LIMIT,
+  UPGRADE_HREF,
+  widgetLimitForPlan,
+} from "@/lib/plan-access";
 import {
   parseWidgetConfig,
   WIDGET_META,
@@ -101,6 +107,8 @@ export function WidgetManager({
   const [dragId, setDragId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [addState, addAction] = useActionState(addWidgetAction, initialState);
+  const widgetLimit = widgetLimitForPlan(plan);
+  const atWidgetLimit = widgets.length >= widgetLimit;
 
   const widgetMap = useMemo(
     () => new Map(widgets.map((widget) => [widget.id, widget])),
@@ -164,8 +172,24 @@ export function WidgetManager({
           <CardBody className="space-y-3">
             {addState.error ? <Alert tone="error">{addState.error}</Alert> : null}
             {addState.success ? <Alert tone="success">{addState.success}</Alert> : null}
+            {atWidgetLimit ? (
+              <Alert tone="info">
+                You&apos;ve reached the {widgetLimit}-widget limit.{" "}
+                {widgetLimit === FREE_WIDGET_LIMIT ? (
+                  <>
+                    Free pages include up to 6 widgets.{" "}
+                    <Link href={UPGRADE_HREF} className="font-semibold underline underline-offset-4">
+                      Upgrade to Pro
+                    </Link>{" "}
+                    for up to 24.
+                  </>
+                ) : (
+                  "Remove a widget to add another one."
+                )}
+              </Alert>
+            ) : null}
 
-            <AddWidgetGrid action={addAction} />
+            <AddWidgetGrid action={addAction} disabled={atWidgetLimit} />
           </CardBody>
         </Card>
 
@@ -178,7 +202,9 @@ export function WidgetManager({
                 page.
               </p>
             </div>
-            <Badge>{widgets.length} widgets</Badge>
+            <Badge>
+              {widgets.length}/{widgetLimit} widgets
+            </Badge>
           </CardHeader>
           <CardBody className="space-y-2">
             {ordered.length === 0 ? (
@@ -248,13 +274,19 @@ export function WidgetManager({
   );
 }
 
-function AddWidgetGrid({ action }: { action: (formData: FormData) => void }) {
+function AddWidgetGrid({
+  action,
+  disabled,
+}: {
+  action: (formData: FormData) => void;
+  disabled?: boolean;
+}) {
   return (
     <form action={action} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
       {WIDGET_TYPES.map((type) => {
         const Icon = WIDGET_ICONS[type];
         return (
-          <AddWidgetButton key={type} type={type}>
+          <AddWidgetButton key={type} type={type} disabled={disabled}>
             <Icon className="size-4" />
             <span className="text-left text-xs font-medium leading-tight">
               {WIDGET_META[type].label}
@@ -266,15 +298,23 @@ function AddWidgetGrid({ action }: { action: (formData: FormData) => void }) {
   );
 }
 
-function AddWidgetButton({ type, children }: { type: WidgetType; children: React.ReactNode }) {
+function AddWidgetButton({
+  type,
+  disabled,
+  children,
+}: {
+  type: WidgetType;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
       name="type"
       value={type}
-      disabled={pending}
-      className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-foreground transition hover:border-ink/25 hover:bg-surface-muted disabled:opacity-50"
+      disabled={pending || disabled}
+      className="flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-foreground transition hover:border-ink/25 hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
       <Plus className="ml-auto size-3.5 shrink-0 text-muted" />

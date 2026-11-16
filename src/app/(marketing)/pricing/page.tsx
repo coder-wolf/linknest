@@ -15,7 +15,7 @@ const faqs = [
   {
     question: "Is the free plan really free?",
     answer:
-      "Yes. One public profile, unlimited basic links, basic themes and basic analytics, with a small LinkNest badge on your page.",
+      "Yes. One public profile, up to 10 basic links, basic themes and basic analytics, with a small LinkNest badge on your page.",
   },
   {
     question: "Can I change plans later?",
@@ -94,7 +94,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-6 text-center text-xs text-muted">
-        Prices are illustrative while we validate demand. Payments arrive in the next milestone.
+        Paid plans are billed monthly through Lemon Squeezy. Cancel any time.
       </p>
 
       <section className="mx-auto mt-20 max-w-3xl">

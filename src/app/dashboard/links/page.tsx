@@ -4,11 +4,12 @@ import { ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireProfile } from "@/lib/session";
 import { LinkManager } from "./link-manager";
+import { canUseLinkIcons, linkLimitForPlan } from "@/lib/plan-access";
 
 export const metadata: Metadata = { title: "My links" };
 
 export default async function LinksPage() {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
 
   const links = await prisma.link.findMany({
     where: { profileId: profile.id },
@@ -42,7 +43,12 @@ export default async function LinksPage() {
         </Link>
       </div>
 
-      <LinkManager key={links.map((link) => link.id).join("-")} links={links} />
+      <LinkManager
+        key={links.map((link) => link.id).join("-")}
+        links={links}
+        canUseIcons={canUseLinkIcons(user.subscription?.plan)}
+        linkLimit={linkLimitForPlan(user.subscription?.plan)}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useActionState } from "react";
+import Link from "next/link";
 import {
   ChevronDown,
   ChevronUp,
@@ -9,6 +10,7 @@ import {
   Eye,
   EyeOff,
   GripVertical,
+  Lock,
   Pencil,
   Plus,
   Trash2,
@@ -18,6 +20,7 @@ import { FieldError, FieldHint, Input, Label, Textarea } from "@/components/ui/f
 import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { cn, formatNumber } from "@/lib/utils";
+import { FREE_LINK_LIMIT, UPGRADE_HREF } from "@/lib/plan-access";
 import {
   createLinkAction,
   deleteLinkAction,
@@ -39,12 +42,21 @@ export type ManagedLink = {
 
 const initialState: LinkFormState = {};
 
-export function LinkManager({ links }: { links: ManagedLink[] }) {
+export function LinkManager({
+  links,
+  canUseIcons,
+  linkLimit,
+}: {
+  links: ManagedLink[];
+  canUseIcons: boolean;
+  linkLimit: number;
+}) {
   const [order, setOrder] = useState(links.map((link) => link.id));
   const [dragId, setDragId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState(createLinkAction, initialState);
+  const atLimit = links.length >= linkLimit;
 
   useEffect(() => {
     if (state.success) {
@@ -92,42 +104,63 @@ export function LinkManager({ links }: { links: ManagedLink[] }) {
           </p>
         </CardHeader>
         <CardBody>
-          <form ref={formRef} action={formAction} className="space-y-3">
-            {state.error ? <Alert tone="error">{state.error}</Alert> : null}
-            {state.success ? <Alert tone="success">{state.success}</Alert> : null}
+          {atLimit ? (
+            <div className="rounded-xl border border-dashed border-border bg-surface-muted/40 p-4">
+              <p className="text-sm font-medium">
+                You&apos;ve reached the {linkLimit}-link limit.
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {linkLimit === FREE_LINK_LIMIT
+                  ? "Free pages include up to 10 links. Upgrade to Pro for up to 200."
+                  : "Delete a link to make room for another one."}
+              </p>
+              {linkLimit === FREE_LINK_LIMIT ? (
+                <Link
+                  href={UPGRADE_HREF}
+                  className="mt-2 inline-flex text-xs font-semibold text-foreground underline underline-offset-4"
+                >
+                  Upgrade to Pro
+                </Link>
+              ) : null}
+            </div>
+          ) : (
+            <form ref={formRef} action={formAction} className="space-y-3">
+              {state.error ? <Alert tone="error">{state.error}</Alert> : null}
+              {state.success ? <Alert tone="success">{state.success}</Alert> : null}
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" name="title" placeholder="My latest project" required />
-                {state.fieldErrors?.title ? (
-                  <FieldError>{state.fieldErrors.title}</FieldError>
-                ) : null}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input id="title" name="title" placeholder="My latest project" required />
+                  {state.fieldErrors?.title ? (
+                    <FieldError>{state.fieldErrors.title}</FieldError>
+                  ) : null}
+                </div>
+                <div>
+                  <Label htmlFor="url">Destination URL</Label>
+                  <Input id="url" name="url" placeholder="https://…" inputMode="url" required />
+                  {state.fieldErrors?.url ? (
+                    <FieldError>{state.fieldErrors.url}</FieldError>
+                  ) : null}
+                </div>
               </div>
               <div>
-                <Label htmlFor="url">Destination URL</Label>
-                <Input id="url" name="url" placeholder="https://…" inputMode="url" required />
-                {state.fieldErrors?.url ? (
-                  <FieldError>{state.fieldErrors.url}</FieldError>
-                ) : null}
+                <Label htmlFor="description">Description (optional)</Label>
+                <Input
+                  id="description"
+                  name="description"
+                  placeholder="A short line shown under the title"
+                  maxLength={160}
+                />
               </div>
-            </div>
-            <div>
-              <Label htmlFor="description">Description (optional)</Label>
-              <Input
-                id="description"
-                name="description"
-                placeholder="A short line shown under the title"
-                maxLength={160}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-3">
-              <FieldHint className="mt-0">Links open in a new tab for visitors.</FieldHint>
-              <SubmitButton size="sm" pendingLabel="Adding…">
-                <Plus className="size-3.5" /> Add link
-              </SubmitButton>
-            </div>
-          </form>
+              <div className="flex items-center justify-between gap-3">
+                <FieldHint className="mt-0">Links open in a new tab for visitors.</FieldHint>
+                <SubmitButton size="sm" pendingLabel="Adding…">
+                  <Plus className="size-3.5" /> Add link
+                </SubmitButton>
+              </div>
+            </form>
+          )}
         </CardBody>
       </Card>
 
@@ -139,7 +172,9 @@ export function LinkManager({ links }: { links: ManagedLink[] }) {
               Drag to reorder, or use the arrows for keyboard-friendly reordering.
             </p>
           </div>
-          <Badge>{links.length} links</Badge>
+          <Badge>
+            {links.length}/{linkLimit} links
+          </Badge>
         </CardHeader>
         <CardBody className="space-y-2">
           {ordered.length === 0 ? (
@@ -151,6 +186,7 @@ export function LinkManager({ links }: { links: ManagedLink[] }) {
               <LinkRow
                 key={link.id}
                 link={link}
+                canUseIcons={canUseIcons}
                 index={index}
                 total={ordered.length}
                 dragging={dragId === link.id}
@@ -169,6 +205,7 @@ export function LinkManager({ links }: { links: ManagedLink[] }) {
 
 function LinkRow({
   link,
+  canUseIcons,
   index,
   total,
   dragging,
@@ -178,6 +215,7 @@ function LinkRow({
   onMove,
 }: {
   link: ManagedLink;
+  canUseIcons: boolean;
   index: number;
   total: number;
   dragging: boolean;
@@ -332,15 +370,29 @@ function LinkRow({
               maxLength={160}
             />
           </div>
-          <div>
-            <Label htmlFor={`icon-${link.id}`}>Thumbnail / icon URL (optional)</Label>
-            <Input
-              id={`icon-${link.id}`}
-              name="iconUrl"
-              defaultValue={link.iconUrl ?? ""}
-              placeholder="https://…"
-            />
-          </div>
+          {canUseIcons ? (
+            <div>
+              <Label htmlFor={`icon-${link.id}`}>Thumbnail / icon URL (optional)</Label>
+              <Input
+                id={`icon-${link.id}`}
+                name="iconUrl"
+                defaultValue={link.iconUrl ?? ""}
+                placeholder="https://…"
+              />
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-border bg-surface-muted/40 px-3.5 py-3">
+              <p className="flex items-center gap-1.5 text-xs font-medium">
+                <Lock className="size-3.5" /> Link thumbnails are a Pro feature
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                Add a small image or icon beside any link.{" "}
+                <Link href={UPGRADE_HREF} className="font-semibold text-foreground underline underline-offset-4">
+                  Upgrade to Pro
+                </Link>
+              </p>
+            </div>
+          )}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
               Cancel

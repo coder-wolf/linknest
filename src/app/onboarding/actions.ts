@@ -7,12 +7,14 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { DEFAULT_THEME } from "@/lib/themes";
+import { UploadError, removeAvatar, uploadAvatar } from "@/lib/uploads";
 import { STARTER_WIDGETS } from "@/lib/widgets";
 import {
   bioSchema,
   displayNameSchema,
   httpUrlSchema,
   PLATFORMS,
+  socialUrlSchema,
   usernameSchema,
 } from "@/lib/validation";
 
@@ -27,11 +29,10 @@ const onboardingSchema = z.object({
   username: usernameSchema,
   displayName: displayNameSchema,
   bio: bioSchema.optional(),
-  avatarUrl: z.union([z.literal(""), httpUrlSchema]).optional(),
   linkTitle: z.string().trim().max(80).optional(),
   linkUrl: z.union([z.literal(""), httpUrlSchema]).optional(),
   socialPlatform: z.enum(platformKeys).optional(),
-  socialUrl: z.union([z.literal(""), httpUrlSchema]).optional(),
+  socialUrl: z.union([z.literal(""), socialUrlSchema]).optional(),
 });
 
 export async function completeOnboardingAction(
@@ -45,7 +46,6 @@ export async function completeOnboardingAction(
     username: formData.get("username"),
     displayName: formData.get("displayName"),
     bio: formData.get("bio") ?? "",
-    avatarUrl: formData.get("avatarUrl") ?? "",
     linkTitle: formData.get("linkTitle") ?? "",
     linkUrl: formData.get("linkUrl") ?? "",
     socialPlatform: formData.get("socialPlatform") || undefined,
@@ -70,6 +70,21 @@ export async function completeOnboardingAction(
     return { fieldErrors: { socialPlatform: "Choose a platform" } };
   }
 
+  let avatarUrl: string | null = null;
+  const avatarFile = formData.get("avatarFile");
+  if (avatarFile instanceof File && avatarFile.size > 0) {
+    try {
+      avatarUrl = await uploadAvatar({ userId: user.id, file: avatarFile });
+    } catch (error) {
+      return {
+        error:
+          error instanceof UploadError
+            ? error.message
+            : "We couldn't upload that photo. Please try again.",
+      };
+    }
+  }
+
   try {
     await prisma.profile.create({
       data: {
@@ -77,7 +92,7 @@ export async function completeOnboardingAction(
         username: data.username,
         displayName: data.displayName,
         bio: data.bio || null,
-        avatarUrl: data.avatarUrl || null,
+        avatarUrl,
         theme: DEFAULT_THEME,
         links: data.linkUrl
           ? {
@@ -107,6 +122,7 @@ export async function completeOnboardingAction(
       },
     });
   } catch (error) {
+    if (avatarUrl) await removeAvatar(avatarUrl);
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return { fieldErrors: { username: "That username is taken. Try another one." } };
     }

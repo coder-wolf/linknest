@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { AvatarUploadField } from "@/components/avatar-upload-field";
 import { Alert, Card, CardBody, CardHeader } from "@/components/ui/card";
 import { FieldError, FieldHint, Input, Label, Textarea } from "@/components/ui/field";
 import { SubmitButton } from "@/components/submit-button";
@@ -76,17 +77,7 @@ export function ProfileForm({
             <FieldHint>280 characters max.</FieldHint>
           </div>
 
-          <div>
-            <Label htmlFor="avatarUrl">Profile picture URL</Label>
-            <Input
-              id="avatarUrl"
-              name="avatarUrl"
-              defaultValue={avatarUrl ?? ""}
-              placeholder="https://…"
-              inputMode="url"
-            />
-            <FieldHint>Paste a public image URL. Uploads arrive in a later release.</FieldHint>
-          </div>
+          <AvatarUploadField key={avatarUrl ?? "no-avatar"} initialUrl={avatarUrl} />
 
           <div className="flex justify-end">
             <SubmitButton size="sm" pendingLabel="Saving…">

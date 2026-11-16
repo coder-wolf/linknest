@@ -21,7 +21,7 @@ const sections = [
   },
   {
     title: "Plans and billing",
-    body: "The free plan is free. Paid plans are billed monthly in advance and renew automatically until cancelled. Payments are not enabled in this release; when they are, prices and taxes will be shown before purchase.",
+    body: "The free plan is free. Paid plans are billed monthly in advance and renew automatically until cancelled. Payments are processed by Lemon Squeezy, our merchant of record. Prices, taxes and currency are shown at checkout before you pay, and you can cancel any time from the customer portal.",
   },
   {
     title: "Availability",

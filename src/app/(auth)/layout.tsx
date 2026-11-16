@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
-      <aside className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-ink p-12 text-white lg:flex">
+      <aside className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-[#17160f] p-12 text-white lg:flex">
         <div className="absolute -left-24 top-24 size-72 rounded-full bg-accent/30 blur-3xl" />
         <div className="absolute -bottom-20 right-0 size-80 rounded-full bg-[#7c5cff]/20 blur-3xl" />
 
@@ -32,12 +33,17 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      <main className="flex flex-1 flex-col">
-        <div className="flex items-center justify-between px-5 py-5 lg:hidden">
-          <Logo />
-          <Link href="/" className="text-sm text-muted hover:text-foreground">
-            Back home
-          </Link>
+      <main className="relative flex flex-1 flex-col">
+        <div className="flex items-center justify-between px-5 py-5 lg:px-8">
+          <div className="lg:hidden">
+            <Logo />
+          </div>
+          <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/" className="text-sm text-muted hover:text-foreground lg:hidden">
+              Back home
+            </Link>
+          </div>
         </div>
         <div className="flex flex-1 items-center justify-center px-5 pb-12 pt-4 sm:px-8">
           <div className="w-full max-w-sm">{children}</div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { isPaidPlan } from "@/lib/plan-access";
 import { requireProfile } from "@/lib/session";
 import { parseTheme } from "@/lib/themes";
 import { WidgetManager, type ManagedWidget } from "./widget-manager";
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: "Page builder" };
 
 export default async function WidgetsPage() {
   const { user, profile } = await requireProfile();
+  const plan = user.subscription?.plan ?? "FREE";
 
   const [widgets, links, socials] = await Promise.all([
     prisma.widget.findMany({
@@ -28,6 +30,10 @@ export default async function WidgetsPage() {
       select: { id: true, platform: true, url: true },
     }),
   ]);
+
+  const previewLinks = isPaidPlan(plan)
+    ? links
+    : links.map((link) => ({ ...link, iconUrl: null }));
 
   return (
     <div className="space-y-6">
@@ -56,10 +62,10 @@ export default async function WidgetsPage() {
           avatarUrl: profile.avatarUrl,
           isPublished: profile.isPublished,
         }}
-        links={links}
+        links={previewLinks}
         socials={socials}
         theme={parseTheme(profile.theme)}
-        plan={user.subscription?.plan ?? "FREE"}
+        plan={plan}
       />
     </div>
   );

@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, BarChart3, Eye, MousePointerClick, Users } from "lucide-react";
+import { ArrowUpRight, BarChart3, Eye, Lock, MousePointerClick, Users } from "lucide-react";
 import { AnalyticsChart, BreakdownBar } from "@/components/dashboard/analytics-chart";
 import { Badge, Card, CardBody, CardHeader, EmptyState } from "@/components/ui/card";
 import { getAnalytics } from "@/lib/analytics";
+import {
+  ANALYTICS_RANGES,
+  UPGRADE_HREF,
+  analyticsDaysForPlan,
+  canUseAdvancedAnalytics,
+} from "@/lib/plan-access";
 import { requireProfile } from "@/lib/session";
 import { formatNumber } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Analytics" };
-
-const RANGES = [7, 30, 90] as const;
 
 export default async function AnalyticsPage({
   searchParams,
@@ -18,9 +22,11 @@ export default async function AnalyticsPage({
 }) {
   const params = await searchParams;
   const requested = Number(params.range);
-  const days = RANGES.includes(requested as (typeof RANGES)[number]) ? requested : 7;
+  const { user, profile } = await requireProfile();
+  const plan = user.subscription?.plan ?? "FREE";
+  const days = analyticsDaysForPlan(plan, requested);
+  const advanced = canUseAdvancedAnalytics(plan);
 
-  const { profile } = await requireProfile();
   const analytics = await getAnalytics(profile.id, days);
 
   const stats = [
@@ -43,17 +49,23 @@ export default async function AnalyticsPage({
           </p>
         </div>
         <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-1">
-          {RANGES.map((range) => (
-            <Link
-              key={range}
-              href={`/dashboard/analytics?range=${range}`}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                days === range ? "bg-ink text-white" : "text-muted hover:text-foreground"
-              }`}
-            >
-              {range} days
-            </Link>
-          ))}
+          {ANALYTICS_RANGES.map((range) => {
+            const locked = !advanced && range !== 7;
+            const active = days === range;
+            return (
+              <Link
+                key={range}
+                href={locked ? UPGRADE_HREF : `/dashboard/analytics?range=${range}`}
+                title={locked ? "Longer ranges are part of Pro" : undefined}
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  active ? "bg-ink text-white" : "text-muted hover:text-foreground"
+                } ${locked ? "opacity-60" : ""}`}
+              >
+                {locked ? <Lock className="size-3" /> : null}
+                {range} days
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -137,48 +149,70 @@ export default async function AnalyticsPage({
           </CardBody>
         </Card>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <h2 className="text-sm font-semibold">Devices</h2>
-            </CardHeader>
-            <CardBody className="space-y-3">
-              {analytics.devices.length === 0 ? (
-                <p className="text-sm text-muted">No views yet.</p>
-              ) : (
-                analytics.devices.map((device) => (
-                  <BreakdownBar
-                    key={device.device}
-                    label={device.device}
-                    value={device.count}
-                    total={deviceTotal}
-                  />
-                ))
-              )}
-            </CardBody>
-          </Card>
+        {advanced ? (
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <h2 className="text-sm font-semibold">Devices</h2>
+              </CardHeader>
+              <CardBody className="space-y-3">
+                {analytics.devices.length === 0 ? (
+                  <p className="text-sm text-muted">No views yet.</p>
+                ) : (
+                  analytics.devices.map((device) => (
+                    <BreakdownBar
+                      key={device.device}
+                      label={device.device}
+                      value={device.count}
+                      total={deviceTotal}
+                    />
+                  ))
+                )}
+              </CardBody>
+            </Card>
 
-          <Card>
+            <Card>
+              <CardHeader>
+                <h2 className="text-sm font-semibold">Traffic sources</h2>
+              </CardHeader>
+              <CardBody className="space-y-2">
+                {analytics.referrers.length === 0 ? (
+                  <p className="text-sm text-muted">No referrers yet.</p>
+                ) : (
+                  analytics.referrers.map((referrer) => (
+                    <div
+                      key={referrer.source}
+                      className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm"
+                    >
+                      <span className="truncate">{referrer.source}</span>
+                      <span className="text-xs text-muted">{referrer.count}</span>
+                    </div>
+                  ))
+                )}
+              </CardBody>
+            </Card>
+          </div>
+        ) : (
+          <Card className="bg-surface-muted/50">
             <CardHeader>
-              <h2 className="text-sm font-semibold">Traffic sources</h2>
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold">
+                <Lock className="size-3.5" /> Devices &amp; traffic sources
+              </h2>
             </CardHeader>
-            <CardBody className="space-y-2">
-              {analytics.referrers.length === 0 ? (
-                <p className="text-sm text-muted">No referrers yet.</p>
-              ) : (
-                analytics.referrers.map((referrer) => (
-                  <div
-                    key={referrer.source}
-                    className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm"
-                  >
-                    <span className="truncate">{referrer.source}</span>
-                    <span className="text-xs text-muted">{referrer.count}</span>
-                  </div>
-                ))
-              )}
+            <CardBody>
+              <p className="text-sm text-muted">
+                See which devices visitors use and where they come from, plus 30- and 90-day
+                ranges, on Pro.
+              </p>
+              <Link
+                href={UPGRADE_HREF}
+                className="mt-3 inline-flex h-9 items-center rounded-full bg-ink px-4 text-sm font-medium text-white"
+              >
+                Upgrade to Pro
+              </Link>
             </CardBody>
           </Card>
-        </div>
+        )}
       </div>
 
       <p className="text-xs text-muted">

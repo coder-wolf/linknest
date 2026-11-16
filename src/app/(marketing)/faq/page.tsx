@@ -11,7 +11,7 @@ const faqs = [
   {
     question: "What exactly is LinkNest?",
     answer:
-      "A link-in-bio platform. You get one public page at linknest.com/yourname that holds all the links you want to share — socials, projects, shop, videos, bookings — with a design you control.",
+      "A link-in-bio platform. You get one public page at linknest.online/yourname that holds all the links you want to share — socials, projects, shop, videos, bookings — with a design you control.",
   },
   {
     question: "How long does setup take?",
@@ -79,7 +79,7 @@ export default function FaqPage() {
         ))}
       </div>
 
-      <div className="mx-auto mt-10 max-w-3xl rounded-2xl bg-ink px-6 py-8 text-center text-white">
+      <div className="mx-auto mt-10 max-w-3xl rounded-2xl bg-[#17160f] px-6 py-8 text-center text-white">
         <p className="font-serif text-2xl">Still curious?</p>
         <p className="mt-1 text-sm text-white/65">
           Try the free plan — it&apos;s the fastest way to see if LinkNest fits.

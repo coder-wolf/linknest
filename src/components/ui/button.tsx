@@ -13,7 +13,7 @@ const variantClasses: Record<Variant, string> = {
     "border border-border bg-surface text-foreground hover:bg-surface-muted focus-visible:outline-ink",
   ghost: "text-foreground hover:bg-surface-muted focus-visible:outline-ink",
   danger:
-    "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 focus-visible:outline-red-500",
+    "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 focus-visible:outline-red-500 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/60",
 };
 
 const sizeClasses: Record<Size, string> = {

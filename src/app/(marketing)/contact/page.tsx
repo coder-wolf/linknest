@@ -26,10 +26,10 @@ export default function ContactPage() {
             <h2 className="mt-3 text-sm font-semibold">Email</h2>
             <p className="mt-1 text-sm text-muted">Usually answered within two working days.</p>
             <a
-              href="mailto:hello@linknest.com"
+              href="mailto:hello@linknest.online"
               className="mt-3 inline-flex text-sm font-medium underline underline-offset-4"
             >
-              hello@linknest.com
+              hello@linknest.online
             </a>
           </Card>
 

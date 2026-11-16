@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { completeOnboardingAction, type OnboardingState } from "./actions";
+import { AvatarUploadField } from "@/components/avatar-upload-field";
 import { ProfilePreview } from "@/components/profile-preview";
 import { Alert } from "@/components/ui/card";
 import { FieldError, FieldHint, Input, Label, Select, Textarea } from "@/components/ui/field";
@@ -43,7 +44,7 @@ export function OnboardingForm({ suggestedName }: { suggestedName: string }) {
             <Label htmlFor="username">Username</Label>
             <div className="flex items-stretch overflow-hidden rounded-xl border border-border bg-surface focus-within:border-ink/40 focus-within:ring-4 focus-within:ring-ink/5">
               <span className="flex items-center border-r border-border bg-surface-muted px-3 text-sm text-muted">
-                linknest.com/
+                linknest.online/
               </span>
               <input
                 id="username"
@@ -107,18 +108,7 @@ export function OnboardingForm({ suggestedName }: { suggestedName: string }) {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="avatarUrl">Profile picture URL</Label>
-              <Input
-                id="avatarUrl"
-                name="avatarUrl"
-                value={avatarUrl}
-                onChange={(event) => setAvatarUrl(event.target.value)}
-                placeholder="https://example.com/avatar.jpg"
-                inputMode="url"
-              />
-              <FieldHint>Optional. Paste a public image URL for now.</FieldHint>
-            </div>
+            <AvatarUploadField onPreviewChange={(url) => setAvatarUrl(url ?? "")} />
           </div>
         </section>
 
@@ -184,12 +174,13 @@ export function OnboardingForm({ suggestedName }: { suggestedName: string }) {
                 name="socialUrl"
                 value={socialUrl}
                 onChange={(event) => setSocialUrl(event.target.value)}
-                placeholder="https://instagram.com/yourname"
+                placeholder="instagram.com/yourname"
                 inputMode="url"
               />
               {state.fieldErrors?.socialUrl ? (
                 <FieldError>{state.fieldErrors.socialUrl}</FieldError>
               ) : null}
+              <FieldHint>https:// is added automatically if you leave it off.</FieldHint>
             </div>
           </div>
 

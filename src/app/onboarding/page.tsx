@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { requireUser } from "@/lib/session";
 import { OnboardingForm } from "./onboarding-form";
 
@@ -20,7 +21,10 @@ export default async function OnboardingPage() {
       <header className="border-b border-border">
         <div className="container-page flex h-16 items-center justify-between">
           <Logo />
-          <span className="text-sm text-muted">About 2 minutes · free forever</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted">About 2 minutes · free forever</span>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

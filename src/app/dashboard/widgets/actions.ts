@@ -11,6 +11,7 @@ import {
   widgetConfigSchemas,
   type WidgetType,
 } from "@/lib/widgets";
+import { FREE_WIDGET_LIMIT, widgetLimitForPlan } from "@/lib/plan-access";
 
 export type WidgetState = {
   error?: string;
@@ -45,12 +46,20 @@ export async function addWidgetAction(
   _prev: WidgetState,
   formData: FormData,
 ): Promise<WidgetState> {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
   const type = text(formData, "type");
   if (!isWidgetType(type)) return { error: "Choose a widget type." };
 
+  const limit = widgetLimitForPlan(user.subscription?.plan);
   const count = await prisma.widget.count({ where: { profileId: profile.id } });
-  if (count >= 24) return { error: "You can add up to 24 widgets." };
+  if (count >= limit) {
+    return {
+      error:
+        limit === FREE_WIDGET_LIMIT
+          ? "Free pages can use up to 6 widgets. Remove one or upgrade to Pro."
+          : "You can add up to 24 widgets.",
+    };
+  }
 
   await prisma.widget.create({
     data: {

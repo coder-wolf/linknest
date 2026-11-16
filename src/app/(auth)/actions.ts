@@ -7,6 +7,8 @@ import { z } from "zod";
 import { signIn, signOut } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { clientKey, rateLimit, rateLimitMessage } from "@/lib/rate-limit";
+import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/email";
+import { issueEmailVerificationToken } from "@/lib/email-verification";
 import { appUrl } from "@/lib/utils";
 import { emailSchema, passwordSchema } from "@/lib/validation";
 
@@ -50,13 +52,24 @@ export async function signupAction(_prev: AuthState, formData: FormData): Promis
   }
 
   const passwordHash = await hash(password, 12);
-  await prisma.user.create({
+  const created = await prisma.user.create({
     data: {
       email,
       passwordHash,
       subscription: { create: {} },
     },
+    select: { id: true, email: true },
   });
+
+  const token = await issueEmailVerificationToken(created.id);
+  const sent = await sendVerificationEmail({
+    to: created.email,
+    name: email.split("@")[0],
+    token,
+  });
+  if (!sent.ok) {
+    console.error("Could not send verification email", sent.error);
+  }
 
   try {
     await signIn("credentials", { email, password, redirectTo: "/onboarding" });
@@ -85,6 +98,13 @@ export async function loginAction(_prev: AuthState, formData: FormData): Promise
   const limiter = rateLimit(await clientKey("login"), 10, 15 * 60 * 1000);
   if (!limiter.ok) return { error: rateLimitMessage(limiter.retryAfter) };
 
+  const accountLimiter = rateLimit(
+    `login-account:${parsed.data.email}`,
+    50,
+    60 * 60 * 1000,
+  );
+  if (!accountLimiter.ok) return { error: rateLimitMessage(accountLimiter.retryAfter) };
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
@@ -111,6 +131,9 @@ export async function requestPasswordResetAction(
   const limiter = rateLimit(await clientKey("reset"), 5, 60 * 60 * 1000);
   if (!limiter.ok) return { error: rateLimitMessage(limiter.retryAfter) };
 
+  const emailLimiter = rateLimit(`reset-email:${email.data}`, 5, 60 * 60 * 1000);
+  if (!emailLimiter.ok) return { error: rateLimitMessage(emailLimiter.retryAfter) };
+
   const genericMessage =
     "If an account exists for that email, a reset link is on its way. The link expires in one hour.";
 
@@ -133,9 +156,14 @@ export async function requestPasswordResetAction(
 
   const resetUrl = `${appUrl("/reset-password")}?token=${token}`;
 
-  // No email provider is configured yet. The link is logged so local
-  // development works end-to-end; wire this to Resend/SES before launch.
-  console.info(`[LinkNest] Password reset link for ${email.data}: ${resetUrl}`);
+  const sent = await sendPasswordResetEmail({
+    to: email.data,
+    name: email.data.split("@")[0],
+    token,
+  });
+  if (!sent.ok) {
+    console.error("Could not send password reset email", sent.error);
+  }
 
   return {
     message: genericMessage,
@@ -175,7 +203,10 @@ export async function resetPasswordAction(
   const passwordHash = await hash(parsed.data.password, 12);
 
   await prisma.$transaction([
-    prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
+    prisma.user.update({
+      where: { id: record.userId },
+      data: { passwordHash, sessionVersion: { increment: 1 } },
+    }),
     prisma.passwordResetToken.deleteMany({ where: { userId: record.userId } }),
   ]);
 

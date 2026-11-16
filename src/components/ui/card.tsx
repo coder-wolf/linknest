@@ -22,8 +22,8 @@ type BadgeTone = "neutral" | "success" | "warning" | "accent";
 
 const tones: Record<BadgeTone, string> = {
   neutral: "bg-surface-muted text-muted",
-  success: "bg-emerald-50 text-emerald-700",
-  warning: "bg-amber-50 text-amber-700",
+  success: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+  warning: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
   accent: "bg-accent-soft text-accent-foreground",
 };
 
@@ -47,8 +47,10 @@ export function Badge({
 type AlertTone = "error" | "success" | "info";
 
 const alertTones: Record<AlertTone, string> = {
-  error: "border-red-200 bg-red-50 text-red-800",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  error:
+    "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/50 dark:text-red-200",
+  success:
+    "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200",
   info: "border-border bg-surface-muted text-foreground",
 };
 

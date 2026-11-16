@@ -3,15 +3,19 @@
 import { Prisma } from "@prisma/client";
 import { compare, hash } from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { signOut } from "@/lib/auth";
+import { sendVerificationEmail } from "@/lib/email";
+import { issueEmailVerificationToken } from "@/lib/email-verification";
+import { cancelSubscription } from "@/lib/lemonsqueezy";
 import { prisma } from "@/lib/prisma";
 import { requireProfile, requireUser } from "@/lib/session";
+import { UploadError, removeAvatar as deleteAvatarBlob, uploadAvatar } from "@/lib/uploads";
 import {
   bioSchema,
   displayNameSchema,
   emailSchema,
-  httpUrlSchema,
   passwordSchema,
   usernameSchema,
 } from "@/lib/validation";
@@ -34,21 +38,45 @@ const profileSchema = z.object({
   displayName: displayNameSchema,
   username: usernameSchema,
   bio: bioSchema.optional(),
-  avatarUrl: z.union([z.literal(""), httpUrlSchema]).optional(),
 });
 
 export async function updateProfileAction(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  const { profile } = await requireProfile();
+  const { user, profile } = await requireProfile();
   const parsed = profileSchema.safeParse({
     displayName: formData.get("displayName"),
     username: formData.get("username"),
     bio: formData.get("bio") ?? "",
-    avatarUrl: formData.get("avatarUrl") ?? "",
   });
   if (!parsed.success) return invalid(parsed.error);
+
+  const avatarFile = formData.get("avatarFile");
+  const shouldRemoveAvatar = formData.get("removeAvatar") === "on";
+
+  let avatarUrl = profile.avatarUrl;
+  let uploadedUrl: string | null = null;
+
+  if (avatarFile instanceof File && avatarFile.size > 0) {
+    try {
+      uploadedUrl = await uploadAvatar({
+        userId: user.id,
+        file: avatarFile,
+        previousUrl: profile.avatarUrl,
+      });
+      avatarUrl = uploadedUrl;
+    } catch (error) {
+      return {
+        error:
+          error instanceof UploadError
+            ? error.message
+            : "We couldn't upload that photo. Please try again.",
+      };
+    }
+  } else if (shouldRemoveAvatar) {
+    avatarUrl = null;
+  }
 
   const oldUsername = profile.username;
 
@@ -59,14 +87,19 @@ export async function updateProfileAction(
         displayName: parsed.data.displayName,
         username: parsed.data.username,
         bio: parsed.data.bio || null,
-        avatarUrl: parsed.data.avatarUrl || null,
+        avatarUrl,
       },
     });
   } catch (error) {
+    if (uploadedUrl) await deleteAvatarBlob(uploadedUrl);
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       return { fieldErrors: { username: "That username is taken. Try another one." } };
     }
     throw error;
+  }
+
+  if (shouldRemoveAvatar && !uploadedUrl) {
+    await deleteAvatarBlob(profile.avatarUrl);
   }
 
   revalidatePath("/dashboard/settings");
@@ -96,10 +129,23 @@ export async function updateEmailAction(
   });
   if (existing) return { fieldErrors: { email: "That email is already in use" } };
 
-  await prisma.user.update({ where: { id: user.id }, data: { email: email.data } });
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { email: email.data, emailVerified: null },
+  });
+
+  const token = await issueEmailVerificationToken(user.id);
+  const sent = await sendVerificationEmail({
+    to: email.data,
+    name: user.profile?.displayName ?? email.data.split("@")[0],
+    token,
+  });
+  if (!sent.ok) {
+    console.error("Could not send verification email after email change", sent.error);
+  }
 
   revalidatePath("/dashboard/settings");
-  return { success: "Email updated" };
+  redirect("/verify-email?emailChanged=1");
 }
 
 const passwordChangeSchema = z
@@ -129,8 +175,14 @@ export async function updatePasswordAction(
   if (!valid) return { fieldErrors: { currentPassword: "Current password is incorrect" } };
 
   const passwordHash = await hash(parsed.data.newPassword, 12);
-  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, sessionVersion: { increment: 1 } },
+  });
 
+  // The version bump revokes every JWT, including this one, so sign out
+  // deliberately instead of leaving the user on a dead session.
+  await signOut({ redirectTo: "/login" });
   return { success: "Password updated" };
 }
 
@@ -149,7 +201,22 @@ export async function deleteAccountAction(
   const valid = password ? await compare(password, user.passwordHash) : false;
   if (!valid) return { fieldErrors: { password: "Password is incorrect" } };
 
+  // Deleting the local row without cancelling the provider subscription would
+  // leave the customer subscribed and still being charged.
+  if (user.subscription?.lemonSqueezySubscriptionId) {
+    try {
+      await cancelSubscription(user.subscription.lemonSqueezySubscriptionId);
+    } catch {
+      return {
+        error:
+          "We couldn't cancel your subscription automatically. Cancel it from the customer portal on the Billing page, then try deleting your account again.",
+      };
+    }
+  }
+
+  const avatarUrl = user.profile?.avatarUrl ?? null;
   await prisma.user.delete({ where: { id: user.id } });
+  await deleteAvatarBlob(avatarUrl);
   await signOut({ redirectTo: "/" });
   return {};
 }
