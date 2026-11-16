@@ -105,6 +105,10 @@ export function WidgetManager({
 }) {
   const [order, setOrder] = useState(widgets.map((widget) => widget.id));
   const [dragId, setDragId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<{
+    id: string;
+    position: "before" | "after";
+  } | null>(null);
   const [, startTransition] = useTransition();
   const [addState, addAction] = useActionState(addWidgetAction, initialState);
   const widgetLimit = widgetLimitForPlan(plan);
@@ -146,15 +150,39 @@ export function WidgetManager({
     persistOrder(next);
   }
 
+  function handleDragOver(targetId: string, event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    if (!dragId || dragId === targetId) {
+      setDropTarget(null);
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const position = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+    setDropTarget({ id: targetId, position });
+  }
+
   function handleDrop(targetId: string) {
-    if (!dragId || dragId === targetId) return;
+    if (!dragId || dragId === targetId) {
+      setDragId(null);
+      setDropTarget(null);
+      return;
+    }
+
     const next = [...orderedIds];
     const from = next.indexOf(dragId);
-    const to = next.indexOf(targetId);
-    if (from === -1 || to === -1) return;
+    if (from === -1) return;
     next.splice(from, 1);
-    next.splice(to, 0, dragId);
+
+    const targetIndex = next.indexOf(targetId);
+    if (targetIndex === -1) return;
+
+    const position =
+      dropTarget?.id === targetId ? dropTarget.position : "after";
+    next.splice(targetIndex + (position === "after" ? 1 : 0), 0, dragId);
+
     setDragId(null);
+    setDropTarget(null);
     persistOrder(next);
   }
 
@@ -227,8 +255,20 @@ export function WidgetManager({
                   index={index}
                   total={ordered.length}
                   dragging={dragId === widget.id}
-                  onDragStart={() => setDragId(widget.id)}
-                  onDragEnd={() => setDragId(null)}
+                  dropIndicator={
+                    dropTarget?.id === widget.id && dragId !== widget.id
+                      ? dropTarget.position
+                      : null
+                  }
+                  onDragStart={() => {
+                    setDragId(widget.id);
+                    setDropTarget(null);
+                  }}
+                  onDragEnd={() => {
+                    setDragId(null);
+                    setDropTarget(null);
+                  }}
+                  onDragOver={(event) => handleDragOver(widget.id, event)}
                   onDrop={() => handleDrop(widget.id)}
                   onMove={move}
                 />
@@ -327,8 +367,10 @@ function WidgetRow({
   index,
   total,
   dragging,
+  dropIndicator,
   onDragStart,
   onDragEnd,
+  onDragOver,
   onDrop,
   onMove,
 }: {
@@ -336,8 +378,10 @@ function WidgetRow({
   index: number;
   total: number;
   dragging: boolean;
+  dropIndicator: "before" | "after" | null;
   onDragStart: () => void;
   onDragEnd: () => void;
+  onDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
   onDrop: () => void;
   onMove: (index: number, direction: -1 | 1) => void;
 }) {
@@ -359,17 +403,26 @@ function WidgetRow({
       draggable
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      onDragOver={(event) => event.preventDefault()}
+      onDragOver={onDragOver}
       onDrop={(event) => {
         event.preventDefault();
         onDrop();
       }}
       className={cn(
-        "rounded-xl border border-border bg-surface transition",
+        "relative rounded-xl border border-border bg-surface transition",
         dragging && "opacity-50",
         !widget.isVisible && "bg-surface-muted/50",
       )}
     >
+      {dropIndicator ? (
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute left-0 right-0 z-10 h-0.5 rounded-full bg-accent shadow-[0_0_0_1px_var(--background)]",
+            dropIndicator === "before" ? "-top-1" : "-bottom-1",
+          )}
+        />
+      ) : null}
       <div className="flex items-center gap-2 px-2.5 py-2.5 sm:gap-3">
         <GripVertical className="size-4 shrink-0 cursor-grab text-muted" />
 
