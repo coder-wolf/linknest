@@ -10,6 +10,7 @@ import {
   buttonStyle,
   cardStyle,
   fontStack,
+  mediaRadius,
   mix,
   readableOn,
   shadowValue,
@@ -535,7 +536,7 @@ function ImageWidget({
       <div
         className="flex aspect-[4/3] items-center justify-center border border-dashed text-xs"
         style={{
-          borderRadius: shapeRadius(theme.buttonShape),
+          borderRadius: mediaRadius(theme.buttonShape),
           borderColor: mix(theme.textColor, 22),
           color: theme.mutedColor,
         }}
@@ -551,7 +552,7 @@ function ImageWidget({
       src={config.url}
       alt={config.alt}
       className="max-h-[340px] w-full object-cover"
-      style={{ borderRadius: shapeRadius(theme.buttonShape) }}
+      style={{ borderRadius: mediaRadius(theme.buttonShape) }}
     />
   );
 
@@ -583,7 +584,7 @@ function VideoWidget({
   interactive: boolean;
 }) {
   const embed = resolveEmbed(config.url);
-  const radius = shapeRadius(theme.buttonShape);
+  const radius = mediaRadius(theme.buttonShape);
 
   if (embed) {
     return (
@@ -651,7 +652,7 @@ function MusicWidget({
   interactive: boolean;
 }) {
   const embed = resolveEmbed(config.url);
-  const radius = shapeRadius(theme.buttonShape);
+  const radius = mediaRadius(theme.buttonShape);
 
   if (embed && embed.kind === "spotify") {
     return (
@@ -783,7 +784,10 @@ function SmartLinkCard({
   interactive: boolean;
 }) {
   const className = "flex w-full items-center gap-3 px-4 py-3.5 text-left";
-  const style = buttonStyle(theme);
+  const style = {
+    ...buttonStyle(theme),
+    borderRadius: mediaRadius(theme.buttonShape),
+  };
   const content = (
     <>
       <span className="shrink-0 opacity-80">{icon}</span>

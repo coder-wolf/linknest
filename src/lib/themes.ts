@@ -507,6 +507,13 @@ export function shapeRadius(shape: ButtonShape) {
   return SHAPE_OPTIONS.find((option) => option.key === shape)?.radius ?? "14px";
 }
 
+/** Media keeps a composed corner radius even when buttons are pill-shaped. */
+export function mediaRadius(shape: ButtonShape) {
+  if (shape === "square") return "6px";
+  if (shape === "pill") return "18px";
+  return "12px";
+}
+
 export function avatarRadius(shape: AvatarShape) {
   if (shape === "square") return "12px";
   if (shape === "squircle") return "32%";
