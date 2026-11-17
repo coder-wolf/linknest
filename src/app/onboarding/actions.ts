@@ -12,7 +12,7 @@ import { STARTER_WIDGETS } from "@/lib/widgets";
 import {
   bioSchema,
   displayNameSchema,
-  httpUrlSchema,
+  linkUrlSchema,
   PLATFORMS,
   socialUrlSchema,
   usernameSchema,
@@ -30,7 +30,7 @@ const onboardingSchema = z.object({
   displayName: displayNameSchema,
   bio: bioSchema.optional(),
   linkTitle: z.string().trim().max(80).optional(),
-  linkUrl: z.union([z.literal(""), httpUrlSchema]).optional(),
+  linkUrl: z.union([z.literal(""), linkUrlSchema]).optional(),
   socialPlatform: z.enum(platformKeys).optional(),
   socialUrl: z.union([z.literal(""), socialUrlSchema]).optional(),
 });

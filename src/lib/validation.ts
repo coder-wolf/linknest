@@ -86,10 +86,10 @@ export const httpUrlSchema = z
   .refine(isHttpUrl, "Enter a valid http(s) URL");
 
 /**
- * Social profile fields accept `instagram.com/name` and add the scheme for
- * people, while still rejecting non-http(s) protocols.
+ * URL fields accept `example.com/path` and add the scheme for people, while
+ * still rejecting non-http(s) protocols.
  */
-export const socialUrlSchema = z
+export const flexibleUrlSchema = z
   .string()
   .trim()
   .max(2048, "URL is too long")
@@ -100,9 +100,14 @@ export const socialUrlSchema = z
   })
   .pipe(httpUrlSchema);
 
+/** Social profile fields use the same forgiving URL handling as links. */
+export const socialUrlSchema = flexibleUrlSchema;
+
+export const linkUrlSchema = flexibleUrlSchema;
+
 export const linkSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(80, "Title is too long"),
-  url: httpUrlSchema,
+  url: linkUrlSchema,
   description: z.string().trim().max(160, "Description is too long").optional(),
 });
 

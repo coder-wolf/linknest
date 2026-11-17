@@ -138,7 +138,7 @@ export function LinkManager({
                 </div>
                 <div>
                   <Label htmlFor="url">Destination URL</Label>
-                  <Input id="url" name="url" placeholder="https://…" inputMode="url" required />
+                  <Input id="url" name="url" placeholder="your-site.com" inputMode="url" required />
                   {state.fieldErrors?.url ? (
                     <FieldError>{state.fieldErrors.url}</FieldError>
                   ) : null}
@@ -154,7 +154,9 @@ export function LinkManager({
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <FieldHint className="mt-0">Links open in a new tab for visitors.</FieldHint>
+                <FieldHint className="mt-0">
+                  Links open in a new tab. https:// is added automatically.
+                </FieldHint>
                 <SubmitButton size="sm" pendingLabel="Adding…">
                   <Plus className="size-3.5" /> Add link
                 </SubmitButton>

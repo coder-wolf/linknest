@@ -142,7 +142,7 @@ export function OnboardingForm({ suggestedName }: { suggestedName: string }) {
                 name="linkUrl"
                 value={linkUrl}
                 onChange={(event) => setLinkUrl(event.target.value)}
-                placeholder="https://your-site.com"
+                placeholder="your-site.com"
                 inputMode="url"
               />
               {state.fieldErrors?.linkUrl ? (
