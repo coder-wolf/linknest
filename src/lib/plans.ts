@@ -38,7 +38,7 @@ export const PLANS: Plan[] = [
       "Up to 200 links",
       "Up to 24 page-builder widgets",
       "Remove LinkNest branding",
-      "All 15 themes + premium mono font",
+      "All 20 themes + premium mono font",
       "Custom background images",
       "Link thumbnails & icons",
       "Advanced analytics (30/90 days, devices, sources)",

@@ -70,7 +70,12 @@ export type ThemePresetKey =
   | "tide"
   | "mono"
   | "citrus"
-  | "dusk";
+  | "dusk"
+  | "neon"
+  | "forest"
+  | "sunset"
+  | "steel"
+  | "peach";
 
 export const THEME_PRESET_KEYS = [
   "minimal",
@@ -88,6 +93,11 @@ export const THEME_PRESET_KEYS = [
   "mono",
   "citrus",
   "dusk",
+  "neon",
+  "forest",
+  "sunset",
+  "steel",
+  "peach",
 ] as const;
 
 export type Theme = {
@@ -439,6 +449,120 @@ export const THEME_PRESETS: Record<
       buttonTextColor: "#2a1630",
       cardColor: "rgba(255, 255, 255, 0.07)",
       buttonStyle: "glass",
+      buttonShape: "rounded",
+      shadow: "soft",
+      font: "serif",
+      layout: "card",
+      texture: "noise",
+      avatarShape: "squircle",
+      backgroundImageUrl: null,
+    },
+  },
+  neon: {
+    label: "Neon",
+    description: "Electric cyan on deep space, built for a late-night launch.",
+    theme: {
+      preset: "neon",
+      background:
+        "radial-gradient(120% 90% at 50% 0%, #101a2b 0%, #05070c 65%)",
+      textColor: "#eafcff",
+      mutedColor: "#8fb4c4",
+      accentColor: "#5ffbf1",
+      buttonColor: "#5ffbf1",
+      buttonTextColor: "#042024",
+      cardColor: "#0b1220",
+      buttonStyle: "solid",
+      buttonShape: "pill",
+      shadow: "hard",
+      font: "grotesk",
+      layout: "classic",
+      texture: "grid",
+      avatarShape: "squircle",
+      backgroundImageUrl: null,
+    },
+  },
+  forest: {
+    label: "Forest",
+    description: "Deep woodland greens with a botanical serif and soft glass.",
+    theme: {
+      preset: "forest",
+      background:
+        "linear-gradient(165deg, #0c2418 0%, #123323 55%, #0a1d14 100%)",
+      textColor: "#eff8e8",
+      mutedColor: "#a9c6a1",
+      accentColor: "#d8f27a",
+      buttonColor: "#d8f27a",
+      buttonTextColor: "#12210d",
+      cardColor: "rgba(255, 255, 255, 0.06)",
+      buttonStyle: "glass",
+      buttonShape: "rounded",
+      shadow: "soft",
+      font: "serif",
+      layout: "classic",
+      texture: "noise",
+      avatarShape: "circle",
+      backgroundImageUrl: null,
+    },
+  },
+  sunset: {
+    label: "Sunset",
+    description: "A warm dusk gradient with glass buttons and golden light.",
+    theme: {
+      preset: "sunset",
+      background:
+        "linear-gradient(160deg, #2b0f1f 0%, #6b1f2e 45%, #c24a2e 100%)",
+      textColor: "#fff3e7",
+      mutedColor: "#f0b79d",
+      accentColor: "#ffd166",
+      buttonColor: "#ffffff",
+      buttonTextColor: "#5a1a16",
+      cardColor: "rgba(255, 255, 255, 0.1)",
+      buttonStyle: "glass",
+      buttonShape: "pill",
+      shadow: "soft",
+      font: "grotesk",
+      layout: "card",
+      texture: "noise",
+      avatarShape: "circle",
+      backgroundImageUrl: null,
+    },
+  },
+  steel: {
+    label: "Steel",
+    description: "Cool industrial greys, tight type and hard edges.",
+    theme: {
+      preset: "steel",
+      background: "linear-gradient(180deg, #e9ecec 0%, #cfd6d8 100%)",
+      textColor: "#161b1d",
+      mutedColor: "#5c686d",
+      accentColor: "#0f5e6b",
+      buttonColor: "#1f2a2e",
+      buttonTextColor: "#f4f7f7",
+      cardColor: "#ffffff",
+      buttonStyle: "solid",
+      buttonShape: "square",
+      shadow: "none",
+      font: "sans",
+      layout: "classic",
+      texture: "grid",
+      avatarShape: "square",
+      backgroundImageUrl: null,
+    },
+  },
+  peach: {
+    label: "Peach",
+    description: "Soft apricot light with a warm serif and airy glass cards.",
+    theme: {
+      preset: "peach",
+      background:
+        "radial-gradient(100% 90% at 20% 0%, #ffe8dc 0%, transparent 60%), linear-gradient(160deg, #fff6ee 0%, #ffe4d3 55%, #f7cdb8 100%)",
+      textColor: "#4a2a1e",
+      mutedColor: "#8c6252",
+      accentColor: "#d95d39",
+      buttonColor: "#4a2a1e",
+      buttonTextColor: "#fff7f0",
+      cardColor: "rgba(255, 255, 255, 0.7)",
+      buttonStyle: "soft",
       buttonShape: "rounded",
       shadow: "soft",
       font: "serif",

@@ -182,7 +182,7 @@ export function AppearanceForm({
           <CardHeader>
             <h2 className="text-sm font-semibold">Theme presets</h2>
             <p className="text-xs text-muted">
-              Fifteen starting points — pick one, then tune every detail below.
+              Twenty starting points — pick one, then tune every detail below.
             </p>
           </CardHeader>
           <CardBody className="grid grid-cols-2 gap-2 sm:grid-cols-3">

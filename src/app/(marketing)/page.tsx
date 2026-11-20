@@ -128,7 +128,7 @@ export default function HomePage() {
                 <Sparkles className="size-3" />
                 New
               </span>
-              Widgets, embeds &amp; fifteen themes
+              Widgets, embeds &amp; twenty themes
               <ArrowUpRight className="size-3.5 text-muted transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
 
@@ -159,7 +159,7 @@ export default function HomePage() {
 
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
               A link-in-bio that finally feels like your work. Compose your page from widgets,
-              dress it in one of fifteen considered themes, and see exactly what your audience clicks.
+              dress it in one of twenty considered themes, and see exactly what your audience clicks.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -201,7 +201,7 @@ export default function HomePage() {
                 ))}
               </div>
               <p className="text-xs leading-relaxed text-muted">
-                <span className="font-semibold text-foreground">15 themes</span> · 9 widget types · 13
+                <span className="font-semibold text-foreground">20 themes</span> · 9 widget types · 13
                 socials
                 <br />
                 one page that finally looks like you.
@@ -613,7 +613,7 @@ export default function HomePage() {
                 Themes
               </p>
               <h2 className="mt-3 font-serif text-3xl tracking-tight sm:text-4xl lg:text-5xl">
-                Fifteen themes. Then make it yours.
+                Twenty themes. Then make it yours.
               </h2>
             </div>
             <div className="max-w-md">

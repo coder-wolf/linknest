@@ -103,9 +103,9 @@ signature verified against `LEMONSQUEEZY_WEBHOOK_SECRET`)
 - 13 social platforms with icons, reordering, show/hide
 - Widget-based page builder: header, links, socials, text, image, video, music, CTA and divider
   blocks, reorderable by drag-and-drop or arrows, each with visibility and inline editing
-- Fifteen theme presets (Paper, Noir, Aurora, Pop, Sand, Cobalt, Sage, Riso, Terminal, Bloom,
-  Ember, Tide, Mono, Citrus, Dusk) with full control over colors, button style/shape, shadow,
-  texture, avatar shape, font and layout
+- Twenty theme presets (Paper, Noir, Aurora, Pop, Sand, Cobalt, Sage, Riso, Terminal, Bloom,
+  Ember, Tide, Mono, Citrus, Dusk, Neon, Forest, Sunset, Steel, Peach) with full control over
+  colors, button style/shape, shadow, texture, avatar shape, font and layout
 - Allowlisted embeds for YouTube, Vimeo and Spotify; raw iframe URLs are never rendered
 - Live previews in onboarding, the appearance editor and the page builder
 - Publish/unpublish with owner-only preview of unpublished pages
@@ -118,7 +118,7 @@ signature verified against `LEMONSQUEEZY_WEBHOOK_SECRET`)
   subscription and removes the uploaded avatar
 - Plan-aware gating: Free gets Paper, Noir, Cobalt, Ember, Bloom, Sage and Riso, 10 links,
   6 widgets, 7-day analytics, no link thumbnails or custom background images; Pro unlocks all
-  15 themes, the mono font, thumbnails, backgrounds, 200 links, 24 widgets and 30/90-day
+  20 themes, the mono font, thumbnails, backgrounds, 200 links, 24 widgets and 30/90-day
   device/source analytics
 - Theme presets apply instantly; Free users can preview Pro themes but need an upgrade to save them
 - Light and dark site themes with a persisted header toggle and system-preference default
