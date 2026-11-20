@@ -458,9 +458,7 @@ export function AppearanceForm({
                 onChange={(event) => update("layout", event.target.value as Theme["layout"])}
               >
                 <option value="classic">Classic — open page</option>
-                <option value="card" disabled={!paid}>
-                  Card — framed profile{!paid ? " (Pro)" : ""}
-                </option>
+                <option value="card">Card — framed profile</option>
               </Select>
             </div>
           </CardBody>

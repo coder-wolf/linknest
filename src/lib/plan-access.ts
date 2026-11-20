@@ -5,6 +5,10 @@ export const FREE_THEME_PRESETS: readonly ThemePresetKey[] = [
   "minimal",
   "dark",
   "cobalt",
+  "ember",
+  "bloom",
+  "sage",
+  "riso",
 ];
 
 export const FREE_FONTS: readonly FontKey[] = ["sans", "grotesk", "serif"];
@@ -38,13 +42,10 @@ export function themeAccessIssue(
   if (isPaidPlan(plan)) return null;
 
   if (theme.preset !== "custom" && !FREE_THEME_PRESETS.includes(theme.preset)) {
-    return "That theme is part of Pro. Pick Paper, Noir or Cobalt, or upgrade to Pro.";
+    return "That theme is part of Pro. Choose a Free theme or upgrade to Pro.";
   }
   if (!FREE_FONTS.includes(theme.font)) {
     return "Geist Mono is part of Pro. Pick another font or upgrade to use it.";
-  }
-  if (theme.layout !== "classic") {
-    return "The framed card layout is part of Pro. Switch to the classic layout or upgrade.";
   }
 
   return null;

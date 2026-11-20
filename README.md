@@ -116,9 +116,10 @@ signature verified against `LEMONSQUEEZY_WEBHOOK_SECRET`)
   a customer portal link, and in-app plan cancellation with end-of-period access
 - Password changes and resets revoke older sessions; account deletion cancels the Lemon Squeezy
   subscription and removes the uploaded avatar
-- Plan-aware gating: Free gets Paper, Noir and Cobalt, 10 links, 6 widgets, 7-day analytics, no
-  link thumbnails or custom background images; Pro unlocks all 15 themes, the mono font,
-  thumbnails, backgrounds, 200 links, 24 widgets and 30/90-day device/source analytics
+- Plan-aware gating: Free gets Paper, Noir, Cobalt, Ember, Bloom, Sage and Riso, 10 links,
+  6 widgets, 7-day analytics, no link thumbnails or custom background images; Pro unlocks all
+  15 themes, the mono font, thumbnails, backgrounds, 200 links, 24 widgets and 30/90-day
+  device/source analytics
 - Theme presets apply instantly; Free users can preview Pro themes but need an upgrade to save them
 - Light and dark site themes with a persisted header toggle and system-preference default
 - Input validation, ownership checks on every mutation, rate limits on auth and tracking
